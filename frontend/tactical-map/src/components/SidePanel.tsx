@@ -14,13 +14,17 @@ export function SidePanel() {
   const {
     satellites,
     cameras,
+    aois,
     showSatellites,
     showCameras,
+    showAOIs,
     satelliteGroup,
     selectedSatellite,
     selectedCamera,
+    selectedAOI,
     toggleSatellites,
     toggleCameras,
+    toggleAOIs,
     setSatelliteGroup,
   } = useTacticalStore();
 
@@ -43,6 +47,14 @@ export function SidePanel() {
             Cámaras
           </label>
           <span className="layer-count">{cameras.length}</span>
+        </div>
+        <div className="layer-row">
+          <label>
+            <input type="checkbox" checked={showAOIs} onChange={toggleAOIs} />
+            <span className="swatch" style={{ background: "#3d9eff" }} />
+            Zonas (AOI)
+          </label>
+          <span className="layer-count">{aois.length}</span>
         </div>
       </div>
 
@@ -71,12 +83,10 @@ export function SidePanel() {
               <span className="v">{selectedSatellite.norad_id ?? "—"}</span>
             </div>
             <div className="detail-row">
-              <span className="k">Lat</span>
-              <span className="v">{selectedSatellite.latitude.toFixed(4)}°</span>
-            </div>
-            <div className="detail-row">
-              <span className="k">Lon</span>
-              <span className="v">{selectedSatellite.longitude.toFixed(4)}°</span>
+              <span className="k">Lat / Lon</span>
+              <span className="v">
+                {selectedSatellite.latitude.toFixed(4)}°, {selectedSatellite.longitude.toFixed(4)}°
+              </span>
             </div>
             <div className="detail-row">
               <span className="k">Altitud</span>
@@ -94,10 +104,6 @@ export function SidePanel() {
           <>
             <div className="detail-name">{selectedCamera.name}</div>
             <div className="detail-row">
-              <span className="k">ID</span>
-              <span className="v">{selectedCamera.id}</span>
-            </div>
-            <div className="detail-row">
               <span className="k">Tipo</span>
               <span className="v">{selectedCamera.type}</span>
             </div>
@@ -111,17 +117,26 @@ export function SidePanel() {
                 {[selectedCamera.city, selectedCamera.country].filter(Boolean).join(", ") || "—"}
               </span>
             </div>
-            <div className="detail-row">
-              <span className="k">Lat / Lon</span>
-              <span className="v">
-                {selectedCamera.latitude.toFixed(3)}, {selectedCamera.longitude.toFixed(3)}
-              </span>
-            </div>
           </>
         )}
-        {!selectedSatellite && !selectedCamera && (
+        {selectedAOI && (
+          <>
+            <div className="detail-name">{selectedAOI.name}</div>
+            <div className="detail-row">
+              <span className="k">Prioridad</span>
+              <span className="v">{selectedAOI.priority}</span>
+            </div>
+            {selectedAOI.description && (
+              <div className="detail-row">
+                <span className="k">Notas</span>
+                <span className="v">{selectedAOI.description}</span>
+              </div>
+            )}
+          </>
+        )}
+        {!selectedSatellite && !selectedCamera && !selectedAOI && (
           <div className="detail-empty">
-            Selecciona un satélite o una cámara en el mapa para ver el detalle.
+            Selecciona un satélite, cámara o zona de interés en el mapa.
           </div>
         )}
       </div>
