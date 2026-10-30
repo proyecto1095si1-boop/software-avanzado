@@ -1,4 +1,4 @@
-import type { Camera, SatellitePosition, AOI, Alert } from "./types";
+import type { Camera, SatellitePosition, AOI, Alert, Pass } from "./types";
 
 const BASE = "";
 
@@ -34,6 +34,22 @@ export async function fetchAlerts(
   if (!res.ok) throw new Error(`alerts ${res.status}`);
   const data = await res.json();
   return data.alerts ?? [];
+}
+
+export async function fetchPasses(
+  group: string = "stations",
+  hours: number = 6,
+  maxSats: number = 25
+): Promise<Pass[]> {
+  const q = new URLSearchParams({
+    group,
+    hours: String(hours),
+    max_sats: String(maxSats),
+  });
+  const res = await fetch(`${BASE}/satellite/passes?${q.toString()}`);
+  if (!res.ok) throw new Error(`passes ${res.status}`);
+  const data = await res.json();
+  return data.passes ?? [];
 }
 
 export async function fetchPositions(
