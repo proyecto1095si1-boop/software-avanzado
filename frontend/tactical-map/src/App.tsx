@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { MapCanvas } from "./components/MapCanvas";
 import { SidePanel } from "./components/SidePanel";
 import { useTacticalStore } from "./store";
-import { fetchCameras, fetchAOIs, positionsWebSocketUrl } from "./api";
+import { fetchCameras, fetchAOIs, fetchAlerts, positionsWebSocketUrl } from "./api";
 import type { PositionsMessage } from "./types";
 
 export default function App() {
@@ -12,10 +12,12 @@ export default function App() {
     satellites,
     cameras,
     aois,
+    alerts,
     satelliteGroup,
     setSatellites,
     setCameras,
     setAOIs,
+    setAlerts,
     setConnection,
   } = useTacticalStore();
 
@@ -30,6 +32,27 @@ export default function App() {
       .then(setAOIs)
       .catch((err) => console.error("aoi", err));
   }, [setCameras, setAOIs]);
+
+  // Alertas: refresco periódico alineado al grupo
+  useEffect(() => {
+    let cancelled = false;
+
+    async function refresh() {
+      try {
+        const list = await fetchAlerts(satelliteGroup, 200);
+        if (!cancelled) setAlerts(list);
+      } catch (err) {
+        console.error("alerts", err);
+      }
+    }
+
+    refresh();
+    const id = window.setInterval(refresh, 15000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [satelliteGroup, setAlerts]);
 
   useEffect(() => {
     let closed = false;
@@ -101,6 +124,9 @@ export default function App() {
             <span className={`status-dot ${connection}`} />
             {statusLabel}
           </span>
+          {alerts.length > 0 && (
+            <span className="header-alerts">{alerts.length} alertas</span>
+          )}
           <span>Grupo: {satelliteGroup}</span>
         </div>
       </header>
@@ -117,6 +143,8 @@ export default function App() {
           CAM <strong>{cameras.length}</strong>
           {" · "}
           AOI <strong>{aois.length}</strong>
+          {" · "}
+          ALT <strong>{alerts.length}</strong>
         </span>
         <span>
           UTC{" "}
