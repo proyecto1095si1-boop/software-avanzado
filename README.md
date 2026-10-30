@@ -2,66 +2,39 @@
 
 **Sistema ISR en tiempo real — cuadro de mando táctico unificado**
 
-Satélites · Cámaras · AOI · Alertas · **Pases previstos** · Docker
-
----
-
-## Arranque rápido (Docker)
+## Arranque
 
 ```bash
 docker compose up --build
+# Panel http://localhost:5173 · API http://localhost:8000/docs
 ```
 
-- Cuadro de mando: http://localhost:5173  
-- API: http://localhost:8000/docs
+## Capacidades (v0.8)
 
-## Arranque en desarrollo
+| Módulo | Qué hace |
+|--------|----------|
+| Space Domain | TLE + SGP4/skyfield → posiciones LIVE |
+| Ground track | Traza orbital al seleccionar un satélite |
+| Clasificación | military / recon / nav / weather / station… |
+| Alertas | Satélite **ahora** dentro de AOI |
+| Pases | Predicción de entradas/salidas sobre AOI |
+| Surface OSINT | Cámaras públicas |
+| AOI | Zonas estratégicas (BA, Malvinas, Gibraltar, Panamá, Suez, Ormuz, Taiwán…) |
+| Docker | Backend + panel de un comando |
 
-```bash
-# Backend
-cd backend && pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+### Flujo táctico en el panel
 
-# Frontend
-cd frontend/tactical-map && npm install && npm run dev
-```
+1. Elegí grupo (`stations`, `military`, `starlink`…)
+2. Mapa LIVE de satélites + cámaras + polígonos AOI
+3. **Click en satélite** → traza orbital + categoría + interés alto
+4. Alertas actuales y pases próximos en el lateral
 
----
+### API útil
 
-## Capacidades (v0.7)
-
-| Módulo | Descripción |
-|--------|-------------|
-| **Space Domain** | TLE CelesTrak + SGP4/skyfield → lat/lon/alt |
-| **Realtime** | WebSocket de posiciones en vivo |
-| **Surface OSINT** | Cámaras públicas georreferenciadas |
-| **AOI** | Zonas de interés (polígonos tácticos) |
-| **Alertas** | Satélite **ahora** dentro de una AOI |
-| **Pases** | Predicción de entradas/salidas sobre AOI (próximas horas) |
-| **Panel** | Un solo mapa: capas + alertas + pases + detalle |
-
-### Endpoints clave
-
-- `GET /satellite/positions/{group}` — batch geodésico
-- `WS /ws/satellite/positions` — stream en vivo
-- `GET /alerts/check?group=stations` — cruces actuales
-- `GET /satellite/passes?group=stations&hours=6` — pases previstos
-- `GET /cameras` · `GET /aoi`
-
----
-
-## Arquitectura
-
-```
-┌─────────────────────────────────────────────────┐
-│     Cuadro de Mando (React + MapLibre)          │
-│  SAT · CAM · AOI · Alertas · Pases · Detalle    │
-└──────────────────────┬──────────────────────────┘
-                       │ REST + WS
-┌──────────────────────▼──────────────────────────┐
-│              Backend FastAPI                    │
-│  satellite · passes · alerts · cameras · aoi    │
-└─────────────────────────────────────────────────┘
-```
+- `GET /satellite/track/{group}/{norad_id}` — traza
+- `GET /satellite/classified/{group}` — posiciones + categoría
+- `GET /satellite/passes?hours=6` — pases
+- `GET /alerts/check` — cruces actuales
+- `WS /ws/satellite/positions` — stream
 
 **Clasificación:** Uso privado / desarrollo interno
