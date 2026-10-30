@@ -8,7 +8,7 @@ from app.api.cameras import router as cameras_router
 app = FastAPI(
     title="Software Avanzado - ISR System",
     description="Sistema de Inteligencia, Vigilancia y Reconocimiento en tiempo real",
-    version="0.3.0",
+    version="0.4.0",
 )
 
 app.add_middleware(
@@ -29,9 +29,9 @@ def root():
     return {
         "system": "Software Avanzado",
         "type": "ISR / Space Domain Awareness + Surface OSINT",
-        "version": "0.3.0",
+        "version": "0.4.0",
         "status": "online",
-        "modules": ["satellite", "realtime", "cameras", "tactical-map (pending)"],
+        "modules": ["satellite", "realtime", "cameras", "tactical-map"],
     }
 
 
