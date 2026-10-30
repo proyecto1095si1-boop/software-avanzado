@@ -2,54 +2,66 @@
 
 **Sistema ISR en tiempo real — cuadro de mando táctico unificado**
 
-Satélites · Cámaras · Zonas de interés · **Alertas** en un solo panel.
+Satélites · Cámaras · AOI · Alertas · **Pases previstos** · Docker
 
 ---
 
-## Arquitectura (v0.6)
-
-```
-┌──────────────────────────────────────────────────────────┐
-│         Cuadro de Mando Táctico (React + MapLibre)       │
-│  Capas SAT + CAM + AOI · Alertas · Detalle unificado     │
-└──────────────────────────┬───────────────────────────────┘
-                           │ REST + WebSocket
-┌──────────────────────────▼───────────────────────────────┐
-│                   Backend FastAPI                        │
-│  /satellite  /cameras  /aoi  /alerts/check  /ws          │
-└──────────────────────────────────────────────────────────┘
-```
-
-## Arranque
+## Arranque rápido (Docker)
 
 ```bash
-cd backend && pip install -r requirements.txt
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+docker compose up --build
+```
 
+- Cuadro de mando: http://localhost:5173  
+- API: http://localhost:8000/docs
+
+## Arranque en desarrollo
+
+```bash
+# Backend
+cd backend && pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+
+# Frontend
 cd frontend/tactical-map && npm install && npm run dev
 ```
 
-- Panel: http://localhost:5173  
-- API: http://localhost:8000/docs
+---
 
-## Capas y lógica táctica
+## Capacidades (v0.7)
 
-| Elemento | Descripción |
-|----------|-------------|
-| Satélites | Posiciones en vivo (WebSocket) |
-| Cámaras | Surface OSINT georreferenciado |
-| AOI | Zonas de interés (polígonos) |
-| **Alertas** | Satélite dentro de una AOI (`GET /alerts/check`) |
+| Módulo | Descripción |
+|--------|-------------|
+| **Space Domain** | TLE CelesTrak + SGP4/skyfield → lat/lon/alt |
+| **Realtime** | WebSocket de posiciones en vivo |
+| **Surface OSINT** | Cámaras públicas georreferenciadas |
+| **AOI** | Zonas de interés (polígonos tácticos) |
+| **Alertas** | Satélite **ahora** dentro de una AOI |
+| **Pases** | Predicción de entradas/salidas sobre AOI (próximas horas) |
+| **Panel** | Un solo mapa: capas + alertas + pases + detalle |
 
-Las alertas se refrescan cada 15s y se muestran en el panel lateral ordenadas por severidad (critical → high → normal).
+### Endpoints clave
 
-## Estado
+- `GET /satellite/positions/{group}` — batch geodésico
+- `WS /ws/satellite/positions` — stream en vivo
+- `GET /alerts/check?group=stations` — cruces actuales
+- `GET /satellite/passes?group=stations&hours=6` — pases previstos
+- `GET /cameras` · `GET /aoi`
 
-- [x] Space Domain (SGP4 + caché + WebSocket)
-- [x] Surface OSINT (cámaras)
-- [x] Zonas de interés (AOI)
-- [x] Alertas satélite-sobre-AOI
-- [x] Cuadro de mando unificado
-- [ ] Docker
+---
+
+## Arquitectura
+
+```
+┌─────────────────────────────────────────────────┐
+│     Cuadro de Mando (React + MapLibre)          │
+│  SAT · CAM · AOI · Alertas · Pases · Detalle    │
+└──────────────────────┬──────────────────────────┘
+                       │ REST + WS
+┌──────────────────────▼──────────────────────────┐
+│              Backend FastAPI                    │
+│  satellite · passes · alerts · cameras · aoi    │
+└─────────────────────────────────────────────────┘
+```
 
 **Clasificación:** Uso privado / desarrollo interno
