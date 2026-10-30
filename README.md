@@ -1,2 +1,115 @@
-# software-avanzado
-Sistema avanzado de conexión en tiempo real con satélites del mundo y cámaras públicas. Basado en repositorios open-source de tracking satelital y feeds de CCTV/webcams públicas.
+# SOFTWARE AVANZADO
+
+**Sistema de Inteligencia, Vigilancia y Reconocimiento (ISR) en Tiempo Real**
+
+Plataforma privada orientada a operaciones de conciencia situacional militar. Integra tracking satelital global y feeds de cámaras públicas para generar un cuadro de mando unificado de inteligencia geoespacial.
+
+---
+
+## Concepto Militar
+
+Este sistema está diseñado con una **esencia táctica / militar**:
+
+- **ISR** (Intelligence, Surveillance, Reconnaissance)
+- Conciencia situacional en tiempo real (Real-Time Situational Awareness)
+- Integración de sensores espaciales + sensores terrestres abiertos (OSINT)
+- Visualización en mapa táctico / globo 3D
+- Enfoque en activos de interés (satélites militares, comerciales y de reconocimiento)
+- Feeds de cámaras públicas como fuente de inteligencia abierta de superficie
+
+No es un juguete civil. Está pensado como núcleo de un **sistema de apoyo a la decisión** para análisis de escenarios, monitoreo de zonas de interés y seguimiento de objetos orbitales.
+
+---
+
+## Módulos Principales (Roadmap)
+
+### 1. Módulo Satelital (Space Domain Awareness)
+- Tracking en tiempo real de satélites (TLE / SGP4)
+- Fuentes: CelesTrak, Space-Track, N2YO
+- Clasificación de objetos: militares, de reconocimiento, Starlink, ISS, debris
+- Predicción de pases sobre zonas de interés
+- Visualización de órbitas y footprints
+
+### 2. Módulo Cámaras Públicas (Surface OSINT)
+- Agregación de feeds CCTV / tráfico / webcams públicas
+- Mapa georreferenciado de cámaras vivas
+- Filtrado por región / zona de operaciones
+- Posible integración futura de visión artificial (detección de vehículos, personas, anomalías)
+
+### 3. Cuadro de Mando Táctico
+- Vista unificada (mapa + lista de activos + feeds en vivo)
+- Capas superpuestas: satélites + cámaras + zonas de interés
+- Alertas configurables (pase de satélite sobre área, cámara caída, etc.)
+
+### 4. Inteligencia y Análisis
+- Registro histórico de posiciones
+- Correlación temporal entre eventos orbitales y superficie
+- Exportación de datos para informes de inteligencia
+
+---
+
+## Stack Tecnológico Previsto
+
+| Capa              | Tecnología recomendada                          |
+|-------------------|-------------------------------------------------|
+| Backend           | Python / FastAPI o Node.js                      |
+| Orbital Mechanics | satellite.js / Orekit / SGP4                    |
+| Frontend          | React + Cesium / MapLibre / Three.js            |
+| Datos TLE         | CelesTrak + Space-Track.org                     |
+| Cámaras           | Agregadores open-source + listas públicas       |
+| Base de datos     | PostgreSQL + PostGIS                            |
+| Despliegue        | Docker + self-hosted                            |
+
+---
+
+## Fuentes Open-Source de Referencia
+
+**Satélites:**
+- [ShenMian/tracker](https://github.com/ShenMian/tracker)
+- [dsuarezv/satellite-tracker](https://github.com/dsuarezv/satellite-tracker)
+- [satvisorcom/satvisor](https://github.com/satvisorcom/satvisor)
+- [BigBodyCobain/Shadowbroker](https://github.com/BigBodyCobain/Shadowbroker)
+
+**Cámaras públicas:**
+- [SoCloseSociety/camforge](https://github.com/SoCloseSociety/camforge)
+- [Phaviwylera/godseye](https://github.com/Phaviwylera/godseye)
+- [thevibegarage/globescope](https://github.com/thevibegarage/globescope)
+
+**Combinados / OSINT militar-civil:**
+- [bilawalsidhu/gods-eye-view](https://github.com/bilawalsidhu/gods-eye-view)
+
+---
+
+## Estructura del Repositorio (próxima)
+
+```
+software-avanzado/
+├── README.md
+├── docs/
+│   └── arquitectura.md
+├── backend/
+│   ├── satellite/
+│   ├── cameras/
+│   └── api/
+├── frontend/
+│   └── tactical-map/
+├── data/
+│   ├── tle/
+│   └── camera-lists/
+└── docker/
+```
+
+---
+
+## Estado Actual
+
+- Repositorio privado creado
+- Concepto militar / ISR definido
+- Roadmap de módulos establecido
+
+**Siguiente paso:** Definir el stack exacto y empezar a implementar el núcleo de tracking satelital + mapa táctico.
+
+---
+
+**Clasificación:** Uso privado / desarrollo interno  
+**Enfoque:** Conciencia situacional + inteligencia abierta de dominio espacial y terrestre
