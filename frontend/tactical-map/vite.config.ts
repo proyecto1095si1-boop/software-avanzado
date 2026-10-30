@@ -8,6 +8,7 @@ export default defineConfig({
     proxy: {
       "/satellite": "http://localhost:8000",
       "/cameras": "http://localhost:8000",
+      "/aoi": "http://localhost:8000",
       "/ws": {
         target: "ws://localhost:8000",
         ws: true,
