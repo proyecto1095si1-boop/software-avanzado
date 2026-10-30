@@ -5,11 +5,12 @@ from app.api.satellite import router as satellite_router
 from app.api.websocket import router as websocket_router
 from app.api.cameras import router as cameras_router
 from app.api.aoi import router as aoi_router
+from app.api.alerts import router as alerts_router
 
 app = FastAPI(
     title="Software Avanzado - ISR System",
     description="Sistema de Inteligencia, Vigilancia y Reconocimiento en tiempo real",
-    version="0.5.0",
+    version="0.6.0",
 )
 
 app.add_middleware(
@@ -24,16 +25,17 @@ app.include_router(satellite_router)
 app.include_router(websocket_router)
 app.include_router(cameras_router)
 app.include_router(aoi_router)
+app.include_router(alerts_router)
 
 
 @app.get("/")
 def root():
     return {
         "system": "Software Avanzado",
-        "type": "ISR / Space Domain + Surface OSINT + AOI",
-        "version": "0.5.0",
+        "type": "ISR / Space Domain + Surface OSINT + AOI + Alerts",
+        "version": "0.6.0",
         "status": "online",
-        "modules": ["satellite", "realtime", "cameras", "aoi", "tactical-map"],
+        "modules": ["satellite", "realtime", "cameras", "aoi", "alerts", "tactical-map"],
     }
 
 
