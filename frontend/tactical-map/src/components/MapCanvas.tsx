@@ -1,10 +1,11 @@
 import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import { useTacticalStore } from "../store";
-import type { SatellitePosition, Camera } from "../types";
+import type { SatellitePosition, Camera, AOI } from "../types";
 
 const SAT_SOURCE = "satellites";
 const CAM_SOURCE = "cameras";
+const AOI_SOURCE = "aois";
 
 function satsToGeoJSON(sats: SatellitePosition[]) {
   return {
@@ -46,18 +47,40 @@ function camsToGeoJSON(cams: Camera[]) {
   };
 }
 
+function aoisToGeoJSON(aois: AOI[]) {
+  return {
+    type: "FeatureCollection" as const,
+    features: aois.map((a) => ({
+      type: "Feature" as const,
+      properties: {
+        id: a.id,
+        name: a.name,
+        description: a.description ?? "",
+        priority: a.priority,
+        color: a.color,
+      },
+      geometry: {
+        type: "Polygon" as const,
+        coordinates: [a.coordinates],
+      },
+    })),
+  };
+}
+
 export function MapCanvas() {
   const mapRef = useRef<maplibregl.Map | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const satellites = useTacticalStore((s) => s.satellites);
   const cameras = useTacticalStore((s) => s.cameras);
+  const aois = useTacticalStore((s) => s.aois);
   const showSatellites = useTacticalStore((s) => s.showSatellites);
   const showCameras = useTacticalStore((s) => s.showCameras);
+  const showAOIs = useTacticalStore((s) => s.showAOIs);
   const selectSatellite = useTacticalStore((s) => s.selectSatellite);
   const selectCamera = useTacticalStore((s) => s.selectCamera);
+  const selectAOI = useTacticalStore((s) => s.selectAOI);
 
-  // Init map once
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
@@ -68,20 +91,12 @@ export function MapCanvas() {
         sources: {
           basemap: {
             type: "raster",
-            tiles: [
-              "https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png",
-            ],
+            tiles: ["https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png"],
             tileSize: 512,
             attribution: "© CARTO",
           },
         },
-        layers: [
-          {
-            id: "basemap",
-            type: "raster",
-            source: "basemap",
-          },
-        ],
+        layers: [{ id: "basemap", type: "raster", source: "basemap" }],
       },
       center: [0, 20],
       zoom: 1.4,
@@ -91,13 +106,28 @@ export function MapCanvas() {
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
 
     map.on("load", () => {
-      map.addSource(SAT_SOURCE, {
-        type: "geojson",
-        data: satsToGeoJSON([]),
+      map.addSource(AOI_SOURCE, { type: "geojson", data: aoisToGeoJSON([]) });
+      map.addSource(SAT_SOURCE, { type: "geojson", data: satsToGeoJSON([]) });
+      map.addSource(CAM_SOURCE, { type: "geojson", data: camsToGeoJSON([]) });
+
+      map.addLayer({
+        id: "aois-fill",
+        type: "fill",
+        source: AOI_SOURCE,
+        paint: {
+          "fill-color": ["get", "color"],
+          "fill-opacity": 0.18,
+        },
       });
-      map.addSource(CAM_SOURCE, {
-        type: "geojson",
-        data: camsToGeoJSON([]),
+      map.addLayer({
+        id: "aois-line",
+        type: "line",
+        source: AOI_SOURCE,
+        paint: {
+          "line-color": ["get", "color"],
+          "line-width": 2,
+          "line-opacity": 0.85,
+        },
       });
 
       map.addLayer({
@@ -133,8 +163,8 @@ export function MapCanvas() {
         selectSatellite({
           name: p?.name ?? "",
           norad_id: p?.norad_id,
-          latitude: (f.geometry as any).coordinates[1],
-          longitude: (f.geometry as any).coordinates[0],
+          latitude: (f.geometry as GeoJSON.Point).coordinates[1],
+          longitude: (f.geometry as GeoJSON.Point).coordinates[0],
           altitude_km: p?.altitude_km ?? 0,
           speed_km_s: p?.speed_km_s,
           timestamp_utc: new Date().toISOString(),
@@ -148,8 +178,8 @@ export function MapCanvas() {
         selectCamera({
           id: p?.id ?? "",
           name: p?.name ?? "",
-          latitude: (f.geometry as any).coordinates[1],
-          longitude: (f.geometry as any).coordinates[0],
+          latitude: (f.geometry as GeoJSON.Point).coordinates[1],
+          longitude: (f.geometry as GeoJSON.Point).coordinates[0],
           type: p?.type ?? "other",
           status: p?.status ?? "unknown",
           city: p?.city,
@@ -157,17 +187,28 @@ export function MapCanvas() {
         });
       });
 
-      map.on("mouseenter", "satellites-circle", () => {
-        map.getCanvas().style.cursor = "pointer";
+      map.on("click", "aois-fill", (e) => {
+        const f = e.features?.[0];
+        if (!f) return;
+        const p = f.properties;
+        const coords = (f.geometry as GeoJSON.Polygon).coordinates[0] as number[][];
+        selectAOI({
+          id: p?.id ?? "",
+          name: p?.name ?? "",
+          description: p?.description,
+          coordinates: coords,
+          color: p?.color ?? "#3d9eff",
+          priority: p?.priority ?? "normal",
+        });
       });
-      map.on("mouseleave", "satellites-circle", () => {
-        map.getCanvas().style.cursor = "";
-      });
-      map.on("mouseenter", "cameras-circle", () => {
-        map.getCanvas().style.cursor = "pointer";
-      });
-      map.on("mouseleave", "cameras-circle", () => {
-        map.getCanvas().style.cursor = "";
+
+      ["satellites-circle", "cameras-circle", "aois-fill"].forEach((layer) => {
+        map.on("mouseenter", layer, () => {
+          map.getCanvas().style.cursor = "pointer";
+        });
+        map.on("mouseleave", layer, () => {
+          map.getCanvas().style.cursor = "";
+        });
       });
     });
 
@@ -176,25 +217,31 @@ export function MapCanvas() {
       map.remove();
       mapRef.current = null;
     };
-  }, [selectSatellite, selectCamera]);
+  }, [selectSatellite, selectCamera, selectAOI]);
 
-  // Update satellite data
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !map.getSource(SAT_SOURCE)) return;
+    if (!map?.getSource(SAT_SOURCE)) return;
     (map.getSource(SAT_SOURCE) as maplibregl.GeoJSONSource).setData(
       satsToGeoJSON(showSatellites ? satellites : [])
     );
   }, [satellites, showSatellites]);
 
-  // Update camera data
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !map.getSource(CAM_SOURCE)) return;
+    if (!map?.getSource(CAM_SOURCE)) return;
     (map.getSource(CAM_SOURCE) as maplibregl.GeoJSONSource).setData(
       camsToGeoJSON(showCameras ? cameras : [])
     );
   }, [cameras, showCameras]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map?.getSource(AOI_SOURCE)) return;
+    (map.getSource(AOI_SOURCE) as maplibregl.GeoJSONSource).setData(
+      aoisToGeoJSON(showAOIs ? aois : [])
+    );
+  }, [aois, showAOIs]);
 
   return <div ref={containerRef} className="map-wrap" />;
 }
