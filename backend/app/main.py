@@ -2,11 +2,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.satellite import router as satellite_router
+from app.api.websocket import router as websocket_router
 
 app = FastAPI(
     title="Software Avanzado - ISR System",
     description="Sistema de Inteligencia, Vigilancia y Reconocimiento en tiempo real",
-    version="0.1.0",
+    version="0.2.0",
 )
 
 app.add_middleware(
@@ -18,6 +19,7 @@ app.add_middleware(
 )
 
 app.include_router(satellite_router)
+app.include_router(websocket_router)
 
 
 @app.get("/")
@@ -25,8 +27,9 @@ def root():
     return {
         "system": "Software Avanzado",
         "type": "ISR / Space Domain Awareness",
+        "version": "0.2.0",
         "status": "online",
-        "modules": ["satellite", "cameras", "tactical-map"],
+        "modules": ["satellite", "realtime", "cameras (pending)", "tactical-map (pending)"],
     }
 
 
