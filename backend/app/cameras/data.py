@@ -1,27 +1,13 @@
 """
-Inventario inicial de cámaras públicas (Surface OSINT).
-Lista curada y de alta calidad. Se irá expandiendo.
-Solo feeds públicos por diseño.
+Inventario de cámaras públicas (Surface OSINT).
+Lista curada — solo feeds públicos por diseño.
 """
 
 from typing import List
 from app.cameras.models import Camera, CameraType, CameraStatus
 
-# Inventario semilla — cámaras públicas conocidas y estables
 SEED_CAMERAS: List[Camera] = [
-    Camera(
-        id="iss-hd",
-        name="ISS HD Earth Viewing Experiment",
-        latitude=0.0,
-        longitude=0.0,
-        url="https://www.youtube.com/watch?v=xRFjfp9RAHR",
-        type=CameraType.other,
-        status=CameraStatus.online,
-        country="Space",
-        city="ISS",
-        source="nasa",
-        notes="Cámara a bordo de la ISS mirando la Tierra (referencia)",
-    ),
+    # --- Argentina / Cono Sur ---
     Camera(
         id="ushuaia-port",
         name="Ushuaia - Puerto",
@@ -33,14 +19,13 @@ SEED_CAMERAS: List[Camera] = [
         country="AR",
         city="Ushuaia",
         source="curated",
-        notes="Zona estratégica extremo sur",
+        notes="Extremo sur — acceso marítimo",
     ),
     Camera(
         id="buenos-aires-obelisco",
         name="Buenos Aires - Obelisco",
         latitude=-34.6037,
         longitude=-58.3816,
-        url=None,
         type=CameraType.traffic,
         status=CameraStatus.unknown,
         country="AR",
@@ -48,11 +33,44 @@ SEED_CAMERAS: List[Camera] = [
         source="curated",
     ),
     Camera(
+        id="buenos-aires-aeroparque",
+        name="Buenos Aires - Aeroparque",
+        latitude=-34.5592,
+        longitude=-58.4156,
+        type=CameraType.aviation,
+        status=CameraStatus.unknown,
+        country="AR",
+        city="Buenos Aires",
+        source="curated",
+    ),
+    Camera(
+        id="cordoba-centro",
+        name="Córdoba - Centro",
+        latitude=-31.4201,
+        longitude=-64.1888,
+        type=CameraType.traffic,
+        status=CameraStatus.unknown,
+        country="AR",
+        city="Córdoba",
+        source="curated",
+    ),
+    Camera(
+        id="mendoza-plaza",
+        name="Mendoza - Plaza Independencia",
+        latitude=-32.8895,
+        longitude=-68.8458,
+        type=CameraType.tourism,
+        status=CameraStatus.unknown,
+        country="AR",
+        city="Mendoza",
+        source="curated",
+    ),
+    # --- Europa ---
+    Camera(
         id="madrid-plaza-mayor",
         name="Madrid - Plaza Mayor",
         latitude=40.4154,
         longitude=-3.7074,
-        url=None,
         type=CameraType.tourism,
         status=CameraStatus.unknown,
         country="ES",
@@ -60,11 +78,21 @@ SEED_CAMERAS: List[Camera] = [
         source="curated",
     ),
     Camera(
+        id="barcelona-sagrada",
+        name="Barcelona - Sagrada Familia",
+        latitude=41.4036,
+        longitude=2.1744,
+        type=CameraType.tourism,
+        status=CameraStatus.unknown,
+        country="ES",
+        city="Barcelona",
+        source="curated",
+    ),
+    Camera(
         id="london-trafalgar",
         name="London - Trafalgar Square",
         latitude=51.5081,
         longitude=-0.1281,
-        url=None,
         type=CameraType.tourism,
         status=CameraStatus.unknown,
         country="GB",
@@ -72,11 +100,33 @@ SEED_CAMERAS: List[Camera] = [
         source="curated",
     ),
     Camera(
+        id="paris-eiffel",
+        name="Paris - Tour Eiffel",
+        latitude=48.8584,
+        longitude=2.2945,
+        type=CameraType.tourism,
+        status=CameraStatus.unknown,
+        country="FR",
+        city="Paris",
+        source="curated",
+    ),
+    Camera(
+        id="berlin-brandenburg",
+        name="Berlin - Brandenburg Gate",
+        latitude=52.5163,
+        longitude=13.3777,
+        type=CameraType.tourism,
+        status=CameraStatus.unknown,
+        country="DE",
+        city="Berlin",
+        source="curated",
+    ),
+    # --- Américas ---
+    Camera(
         id="nyc-times-square",
         name="New York - Times Square",
         latitude=40.7580,
         longitude=-73.9855,
-        url=None,
         type=CameraType.tourism,
         status=CameraStatus.unknown,
         country="US",
@@ -84,11 +134,33 @@ SEED_CAMERAS: List[Camera] = [
         source="curated",
     ),
     Camera(
+        id="miami-port",
+        name="Miami - Port",
+        latitude=25.7781,
+        longitude=-80.1795,
+        type=CameraType.marine,
+        status=CameraStatus.unknown,
+        country="US",
+        city="Miami",
+        source="curated",
+    ),
+    Camera(
+        id="santiago-plaza",
+        name="Santiago - Plaza de Armas",
+        latitude=-33.4378,
+        longitude=-70.6505,
+        type=CameraType.tourism,
+        status=CameraStatus.unknown,
+        country="CL",
+        city="Santiago",
+        source="curated",
+    ),
+    # --- Asia / Pacífico ---
+    Camera(
         id="tokyo-shibuya",
         name="Tokyo - Shibuya Crossing",
         latitude=35.6595,
         longitude=139.7004,
-        url=None,
         type=CameraType.traffic,
         status=CameraStatus.unknown,
         country="JP",
@@ -100,16 +172,39 @@ SEED_CAMERAS: List[Camera] = [
         name="Singapore - Marina Bay",
         latitude=1.2868,
         longitude=103.8545,
-        url=None,
         type=CameraType.tourism,
         status=CameraStatus.unknown,
         country="SG",
         city="Singapore",
         source="curated",
     ),
+    Camera(
+        id="dubai-marina",
+        name="Dubai - Marina",
+        latitude=25.0805,
+        longitude=55.1403,
+        type=CameraType.tourism,
+        status=CameraStatus.unknown,
+        country="AE",
+        city="Dubai",
+        source="curated",
+    ),
+    # --- Referencia espacial ---
+    Camera(
+        id="iss-hd",
+        name="ISS HD Earth Viewing",
+        latitude=0.0,
+        longitude=0.0,
+        url="https://www.youtube.com/watch?v=xRFjfp9RAHR",
+        type=CameraType.other,
+        status=CameraStatus.online,
+        country="Space",
+        city="ISS",
+        source="nasa",
+        notes="Cámara a bordo ISS",
+    ),
 ]
 
 
 def get_all_cameras() -> List[Camera]:
-    """Devuelve el inventario actual de cámaras."""
     return SEED_CAMERAS.copy()
