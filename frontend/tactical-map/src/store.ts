@@ -8,12 +8,20 @@ import type {
   Pass,
 } from "./types";
 
+export interface TrackData {
+  name: string;
+  norad_id?: string;
+  segments: number[][][];
+  classification?: { category: string; tags: string[]; high_interest: boolean };
+}
+
 interface TacticalState {
   satellites: SatellitePosition[];
   cameras: Camera[];
   aois: AOI[];
   alerts: Alert[];
   passes: Pass[];
+  track: TrackData | null;
   lastUpdate: string | null;
   connection: ConnectionStatus;
   satelliteGroup: string;
@@ -21,6 +29,7 @@ interface TacticalState {
   showSatellites: boolean;
   showCameras: boolean;
   showAOIs: boolean;
+  showTrack: boolean;
 
   selectedSatellite: SatellitePosition | null;
   selectedCamera: Camera | null;
@@ -31,11 +40,13 @@ interface TacticalState {
   setAOIs: (aois: AOI[]) => void;
   setAlerts: (alerts: Alert[]) => void;
   setPasses: (passes: Pass[]) => void;
+  setTrack: (track: TrackData | null) => void;
   setConnection: (status: ConnectionStatus) => void;
   setSatelliteGroup: (group: string) => void;
   toggleSatellites: () => void;
   toggleCameras: () => void;
   toggleAOIs: () => void;
+  toggleTrack: () => void;
   selectSatellite: (sat: SatellitePosition | null) => void;
   selectCamera: (cam: Camera | null) => void;
   selectAOI: (aoi: AOI | null) => void;
@@ -47,6 +58,7 @@ export const useTacticalStore = create<TacticalState>((set) => ({
   aois: [],
   alerts: [],
   passes: [],
+  track: null,
   lastUpdate: null,
   connection: "offline",
   satelliteGroup: "stations",
@@ -54,6 +66,7 @@ export const useTacticalStore = create<TacticalState>((set) => ({
   showSatellites: true,
   showCameras: true,
   showAOIs: true,
+  showTrack: true,
 
   selectedSatellite: null,
   selectedCamera: null,
@@ -68,15 +81,17 @@ export const useTacticalStore = create<TacticalState>((set) => ({
   setAOIs: (aois) => set({ aois }),
   setAlerts: (alerts) => set({ alerts }),
   setPasses: (passes) => set({ passes }),
+  setTrack: (track) => set({ track }),
   setConnection: (status) => set({ connection: status }),
   setSatelliteGroup: (group) => set({ satelliteGroup: group }),
   toggleSatellites: () => set((s) => ({ showSatellites: !s.showSatellites })),
   toggleCameras: () => set((s) => ({ showCameras: !s.showCameras })),
   toggleAOIs: () => set((s) => ({ showAOIs: !s.showAOIs })),
+  toggleTrack: () => set((s) => ({ showTrack: !s.showTrack })),
   selectSatellite: (sat) =>
     set({ selectedSatellite: sat, selectedCamera: null, selectedAOI: null }),
   selectCamera: (cam) =>
-    set({ selectedCamera: cam, selectedSatellite: null, selectedAOI: null }),
+    set({ selectedCamera: cam, selectedSatellite: null, selectedAOI: null, track: null }),
   selectAOI: (aoi) =>
-    set({ selectedAOI: aoi, selectedSatellite: null, selectedCamera: null }),
+    set({ selectedAOI: aoi, selectedSatellite: null, selectedCamera: null, track: null }),
 }));
