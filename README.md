@@ -2,53 +2,54 @@
 
 **Sistema ISR en tiempo real — cuadro de mando táctico unificado**
 
-Satélites + cámaras públicas + zonas de interés (AOI) en un solo panel.
+Satélites · Cámaras · Zonas de interés · **Alertas** en un solo panel.
 
 ---
 
-## Arquitectura (v0.5)
+## Arquitectura (v0.6)
 
 ```
 ┌──────────────────────────────────────────────────────────┐
 │         Cuadro de Mando Táctico (React + MapLibre)       │
-│   Capas: Satélites · Cámaras · AOI · Detalle unificado   │
+│  Capas SAT + CAM + AOI · Alertas · Detalle unificado     │
 └──────────────────────────┬───────────────────────────────┘
                            │ REST + WebSocket
 ┌──────────────────────────▼───────────────────────────────┐
 │                   Backend FastAPI                        │
-│  /satellite/*  ·  /cameras/*  ·  /aoi/*  ·  /ws/*        │
+│  /satellite  /cameras  /aoi  /alerts/check  /ws          │
 └──────────────────────────────────────────────────────────┘
 ```
 
 ## Arranque
 
 ```bash
-# Backend
 cd backend && pip install -r requirements.txt
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
-# Frontend
 cd frontend/tactical-map && npm install && npm run dev
 ```
 
 - Panel: http://localhost:5173  
 - API: http://localhost:8000/docs
 
-## Capas del mapa
+## Capas y lógica táctica
 
-| Capa | Color | Fuente |
-|------|-------|--------|
-| Satélites | Verde | WebSocket en vivo |
-| Cámaras | Naranja | `/cameras` |
-| Zonas AOI | Según prioridad | `/aoi` |
+| Elemento | Descripción |
+|----------|-------------|
+| Satélites | Posiciones en vivo (WebSocket) |
+| Cámaras | Surface OSINT georreferenciado |
+| AOI | Zonas de interés (polígonos) |
+| **Alertas** | Satélite dentro de una AOI (`GET /alerts/check`) |
+
+Las alertas se refrescan cada 15s y se muestran en el panel lateral ordenadas por severidad (critical → high → normal).
 
 ## Estado
 
 - [x] Space Domain (SGP4 + caché + WebSocket)
-- [x] Surface OSINT (cámaras georreferenciadas)
+- [x] Surface OSINT (cámaras)
 - [x] Zonas de interés (AOI)
+- [x] Alertas satélite-sobre-AOI
 - [x] Cuadro de mando unificado
-- [ ] Alertas (satélite sobre AOI)
 - [ ] Docker
 
 **Clasificación:** Uso privado / desarrollo interno
