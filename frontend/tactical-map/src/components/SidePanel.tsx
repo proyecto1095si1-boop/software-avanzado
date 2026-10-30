@@ -15,6 +15,7 @@ export function SidePanel() {
     satellites,
     cameras,
     aois,
+    alerts,
     showSatellites,
     showCameras,
     showAOIs,
@@ -73,6 +74,27 @@ export function SidePanel() {
         </select>
       </div>
 
+      <div className="side-section alerts-section">
+        <h3>
+          Alertas{" "}
+          {alerts.length > 0 && <span className="alert-badge">{alerts.length}</span>}
+        </h3>
+        {alerts.length === 0 ? (
+          <div className="detail-empty">Sin cruces satélite / AOI</div>
+        ) : (
+          <ul className="alert-list">
+            {alerts.slice(0, 12).map((a) => (
+              <li key={a.id} className={`alert-item severity-${a.severity}`}>
+                <div className="alert-title">{a.title}</div>
+                <div className="alert-meta">
+                  {a.altitude_km.toFixed(0)} km · {a.severity}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
       <div className="detail">
         <h3>Detalle</h3>
         {selectedSatellite && (
@@ -92,12 +114,6 @@ export function SidePanel() {
               <span className="k">Altitud</span>
               <span className="v">{selectedSatellite.altitude_km.toFixed(1)} km</span>
             </div>
-            {selectedSatellite.speed_km_s != null && (
-              <div className="detail-row">
-                <span className="k">Velocidad</span>
-                <span className="v">{selectedSatellite.speed_km_s.toFixed(2)} km/s</span>
-              </div>
-            )}
           </>
         )}
         {selectedCamera && (
@@ -106,10 +122,6 @@ export function SidePanel() {
             <div className="detail-row">
               <span className="k">Tipo</span>
               <span className="v">{selectedCamera.type}</span>
-            </div>
-            <div className="detail-row">
-              <span className="k">Estado</span>
-              <span className="v">{selectedCamera.status}</span>
             </div>
             <div className="detail-row">
               <span className="k">Ubicación</span>
@@ -136,7 +148,7 @@ export function SidePanel() {
         )}
         {!selectedSatellite && !selectedCamera && !selectedAOI && (
           <div className="detail-empty">
-            Selecciona un satélite, cámara o zona de interés en el mapa.
+            Selecciona un activo en el mapa.
           </div>
         )}
       </div>
