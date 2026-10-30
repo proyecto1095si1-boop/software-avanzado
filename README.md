@@ -21,30 +21,24 @@ No es un juguete civil. Está pensado como núcleo de un **sistema de apoyo a la
 
 ---
 
-## Módulos Principales (Roadmap)
+## Módulos Principales
 
-### 1. Módulo Satelital (Space Domain Awareness)
-- Tracking en tiempo real de satélites (TLE / SGP4)
-- Fuentes: CelesTrak, Space-Track, N2YO
-- Clasificación de objetos: militares, de reconocimiento, Starlink, ISS, debris
-- Predicción de pases sobre zonas de interés
-- Visualización de órbitas y footprints
+### 1. Módulo Satelital (Space Domain Awareness) — OPERATIVO
+- Tracking en tiempo real de satélites (TLE / SGP4 + skyfield)
+- Caché de TLE + WebSocket de posiciones en vivo
+- Coordenadas geodésicas listas para mapa
 
-### 2. Módulo Cámaras Públicas (Surface OSINT)
-- Agregación de feeds CCTV / tráfico / webcams públicas
-- Mapa georreferenciado de cámaras vivas
-- Filtrado por región / zona de operaciones
-- Posible integración futura de visión artificial (detección de vehículos, personas, anomalías)
+### 2. Módulo Cámaras Públicas (Surface OSINT) — OPERATIVO (v0.3)
+- Inventario curado de cámaras públicas georreferenciadas
+- API de filtrado por tipo, país, estado y bounding box
+- Base lista para expandir con más fuentes (Insecam-style, listas oficiales)
 
-### 3. Cuadro de Mando Táctico
-- Vista unificada (mapa + lista de activos + feeds en vivo)
-- Capas superpuestas: satélites + cámaras + zonas de interés
-- Alertas configurables (pase de satélite sobre área, cámara caída, etc.)
+### 3. Cuadro de Mando Táctico — PENDIENTE
+- Vista unificada (mapa + capas de satélites + cámaras)
+- Capas superpuestas + alertas
 
-### 4. Inteligencia y Análisis
-- Registro histórico de posiciones
+### 4. Inteligencia y Análisis — FUTURO
 - Correlación temporal entre eventos orbitales y superficie
-- Exportación de datos para informes de inteligencia
 
 ---
 
@@ -57,42 +51,22 @@ No es un juguete civil. Está pensado como núcleo de un **sistema de apoyo a la
 | Realtime          | WebSocket                                   |
 | Frontend          | React + MapLibre / Cesium (próximo)         |
 | Datos TLE         | CelesTrak                                   |
-| Cámaras           | Agregadores open-source + listas públicas   |
-| Base de datos     | PostgreSQL + PostGIS (próximo)              |
-| Despliegue        | Docker + self-hosted (próximo)              |
+| Cámaras           | Inventario curado + APIs públicas           |
 
 ---
 
-## Fuentes Open-Source de Referencia
+## Estado Actual (v0.3)
 
-**Satélites:**
-- [ShenMian/tracker](https://github.com/ShenMian/tracker)
-- [satvisorcom/satvisor](https://github.com/satvisorcom/satvisor)
-
-**Cámaras públicas:**
-- [SoCloseSociety/camforge](https://github.com/SoCloseSociety/camforge)
-
-**Combinados / OSINT:**
-- [bilawalsidhu/gods-eye-view](https://github.com/bilawalsidhu/gods-eye-view)
-
----
-
-## Estado Actual (v0.2)
-
-- [x] Repositorio privado creado
-- [x] Concepto militar / ISR definido
 - [x] Backend FastAPI operativo
-- [x] Descarga y parseo de TLE desde CelesTrak
-- [x] Propagación SGP4 + skyfield
-- [x] Conversión ECI → latitud / longitud / altitud
-- [x] Endpoint de posición individual lista para mapa
-- [x] Endpoint batch de posiciones (`/satellite/positions/{group}`)
-- [x] **Caché de TLE en memoria (TTL 2h)**
-- [x] **WebSocket de posiciones en vivo** (`/ws/satellite/positions`)
-- [ ] Módulo de cámaras públicas
+- [x] Propagación SGP4 + skyfield (lat/lon/alt)
+- [x] Endpoint batch de posiciones
+- [x] Caché de TLE (TTL 2h)
+- [x] WebSocket de posiciones en vivo
+- [x] **Módulo de cámaras públicas (API + inventario inicial)**
+- [ ] Expansión de fuentes de cámaras
 - [ ] Frontend táctico (MapLibre / Cesium)
 
-**Siguiente paso:** Módulo de cámaras (Surface OSINT) o frontend táctico mínimo.
+**Siguiente paso:** Frontend táctico mínimo que consuma satélites + cámaras.
 
 ---
 
