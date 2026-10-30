@@ -8,6 +8,10 @@ const CAM_SOURCE = "cameras";
 const AOI_SOURCE = "aois";
 const TRACK_SOURCE = "track";
 
+// Basemap oscuro sin API key (ArcGIS usa {z}/{y}/{x})
+const BASEMAP_TILES =
+  "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}";
+
 function satsToGeoJSON(sats: SatellitePosition[]) {
   return {
     type: "FeatureCollection" as const,
@@ -111,9 +115,9 @@ export function MapCanvas() {
         sources: {
           basemap: {
             type: "raster",
-            tiles: ["https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png"],
-            tileSize: 512,
-            attribution: "© CARTO",
+            tiles: [BASEMAP_TILES],
+            tileSize: 256,
+            attribution: "© Esri",
           },
         },
         layers: [{ id: "basemap", type: "raster", source: "basemap" }],
