@@ -1,4 +1,4 @@
-import type { Camera, SatellitePosition, AOI } from "./types";
+import type { Camera, SatellitePosition, AOI, Alert } from "./types";
 
 const BASE = "";
 
@@ -23,6 +23,17 @@ export async function fetchAOIs(): Promise<AOI[]> {
   if (!res.ok) throw new Error(`aoi ${res.status}`);
   const data = await res.json();
   return data.aois ?? [];
+}
+
+export async function fetchAlerts(
+  group: string = "stations",
+  limit: number = 200
+): Promise<Alert[]> {
+  const q = new URLSearchParams({ group, limit: String(limit) });
+  const res = await fetch(`${BASE}/alerts/check?${q.toString()}`);
+  if (!res.ok) throw new Error(`alerts ${res.status}`);
+  const data = await res.json();
+  return data.alerts ?? [];
 }
 
 export async function fetchPositions(
