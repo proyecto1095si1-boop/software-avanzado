@@ -3,6 +3,7 @@ import { useTacticalStore } from "../store";
 const GROUPS = [
   "stations",
   "visual",
+  "military",
   "starlink",
   "weather",
   "gps-ops",
@@ -10,12 +11,21 @@ const GROUPS = [
   "active",
 ];
 
+function fmtTime(iso: string) {
+  try {
+    return new Date(iso).toISOString().replace("T", " ").slice(11, 16);
+  } catch {
+    return iso;
+  }
+}
+
 export function SidePanel() {
   const {
     satellites,
     cameras,
     aois,
     alerts,
+    passes,
     showSatellites,
     showCameras,
     showAOIs,
@@ -76,18 +86,40 @@ export function SidePanel() {
 
       <div className="side-section alerts-section">
         <h3>
-          Alertas{" "}
+          Alertas ahora{" "}
           {alerts.length > 0 && <span className="alert-badge">{alerts.length}</span>}
         </h3>
         {alerts.length === 0 ? (
-          <div className="detail-empty">Sin cruces satélite / AOI</div>
+          <div className="detail-empty">Sin cruces activos</div>
         ) : (
           <ul className="alert-list">
-            {alerts.slice(0, 12).map((a) => (
+            {alerts.slice(0, 8).map((a) => (
               <li key={a.id} className={`alert-item severity-${a.severity}`}>
                 <div className="alert-title">{a.title}</div>
+                <div className="alert-meta">{a.altitude_km.toFixed(0)} km · {a.severity}</div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className="side-section alerts-section">
+        <h3>
+          Pases próximos{" "}
+          {passes.length > 0 && <span className="alert-badge" style={{ background: "#3d9eff" }}>{passes.length}</span>}
+        </h3>
+        {passes.length === 0 ? (
+          <div className="detail-empty">Sin pases en la ventana</div>
+        ) : (
+          <ul className="alert-list">
+            {passes.slice(0, 10).map((p, i) => (
+              <li key={`${p.norad_id}-${p.aoi_id}-${i}`} className={`alert-item severity-${p.priority}`}>
+                <div className="alert-title">
+                  {p.satellite_name} → {p.aoi_name}
+                </div>
                 <div className="alert-meta">
-                  {a.altitude_km.toFixed(0)} km · {a.severity}
+                  {fmtTime(p.enter_utc)}–{fmtTime(p.exit_utc)} UTC · {Math.round(p.duration_s / 60)} min
+                  {p.ongoing ? " · EN CURSO" : ""}
                 </div>
               </li>
             ))}
@@ -147,9 +179,7 @@ export function SidePanel() {
           </>
         )}
         {!selectedSatellite && !selectedCamera && !selectedAOI && (
-          <div className="detail-empty">
-            Selecciona un activo en el mapa.
-          </div>
+          <div className="detail-empty">Selecciona un activo en el mapa.</div>
         )}
       </div>
     </aside>
