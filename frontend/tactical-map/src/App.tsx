@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { MapCanvas } from "./components/MapCanvas";
 import { SidePanel } from "./components/SidePanel";
 import { useTacticalStore } from "./store";
-import { fetchCameras, positionsWebSocketUrl } from "./api";
+import { fetchCameras, fetchAOIs, positionsWebSocketUrl } from "./api";
 import type { PositionsMessage } from "./types";
 
 export default function App() {
@@ -11,23 +11,26 @@ export default function App() {
     lastUpdate,
     satellites,
     cameras,
+    aois,
     satelliteGroup,
     setSatellites,
     setCameras,
+    setAOIs,
     setConnection,
   } = useTacticalStore();
 
   const wsRef = useRef<WebSocket | null>(null);
   const retryRef = useRef<number>(0);
 
-  // Load cameras once
   useEffect(() => {
     fetchCameras()
       .then(setCameras)
       .catch((err) => console.error("cameras", err));
-  }, [setCameras]);
+    fetchAOIs()
+      .then(setAOIs)
+      .catch((err) => console.error("aoi", err));
+  }, [setCameras, setAOIs]);
 
-  // WebSocket for satellites — reconnects when group changes
   useEffect(() => {
     let closed = false;
     let timer: number | undefined;
@@ -52,7 +55,7 @@ export default function App() {
             setSatellites(msg.satellites, msg.timestamp_utc);
           }
         } catch {
-          /* ignore parse errors */
+          /* ignore */
         }
       };
 
@@ -64,9 +67,7 @@ export default function App() {
         timer = window.setTimeout(connect, delay);
       };
 
-      ws.onerror = () => {
-        ws.close();
-      };
+      ws.onerror = () => ws.close();
     }
 
     connect();
@@ -111,15 +112,17 @@ export default function App() {
 
       <footer className="statusbar">
         <span>
-          Satélites: <strong>{satellites.length}</strong>
+          SAT <strong>{satellites.length}</strong>
           {" · "}
-          Cámaras: <strong>{cameras.length}</strong>
+          CAM <strong>{cameras.length}</strong>
+          {" · "}
+          AOI <strong>{aois.length}</strong>
         </span>
         <span>
-          Última actualización:{" "}
+          UTC{" "}
           <strong>
             {lastUpdate
-              ? new Date(lastUpdate).toISOString().replace("T", " ").slice(0, 19) + " UTC"
+              ? new Date(lastUpdate).toISOString().replace("T", " ").slice(0, 19)
               : "—"}
           </strong>
         </span>
