@@ -26,9 +26,11 @@ export function SidePanel() {
     aois,
     alerts,
     passes,
+    track,
     showSatellites,
     showCameras,
     showAOIs,
+    showTrack,
     satelliteGroup,
     selectedSatellite,
     selectedCamera,
@@ -36,6 +38,7 @@ export function SidePanel() {
     toggleSatellites,
     toggleCameras,
     toggleAOIs,
+    toggleTrack,
     setSatelliteGroup,
   } = useTacticalStore();
 
@@ -67,6 +70,14 @@ export function SidePanel() {
           </label>
           <span className="layer-count">{aois.length}</span>
         </div>
+        <div className="layer-row">
+          <label>
+            <input type="checkbox" checked={showTrack} onChange={toggleTrack} />
+            <span className="swatch sat" style={{ opacity: 0.5 }} />
+            Traza orbital
+          </label>
+          <span className="layer-count">{track ? "ON" : "—"}</span>
+        </div>
       </div>
 
       <div className="side-section">
@@ -93,7 +104,7 @@ export function SidePanel() {
           <div className="detail-empty">Sin cruces activos</div>
         ) : (
           <ul className="alert-list">
-            {alerts.slice(0, 8).map((a) => (
+            {alerts.slice(0, 6).map((a) => (
               <li key={a.id} className={`alert-item severity-${a.severity}`}>
                 <div className="alert-title">{a.title}</div>
                 <div className="alert-meta">{a.altitude_km.toFixed(0)} km · {a.severity}</div>
@@ -106,19 +117,23 @@ export function SidePanel() {
       <div className="side-section alerts-section">
         <h3>
           Pases próximos{" "}
-          {passes.length > 0 && <span className="alert-badge" style={{ background: "#3d9eff" }}>{passes.length}</span>}
+          {passes.length > 0 && (
+            <span className="alert-badge" style={{ background: "#3d9eff" }}>
+              {passes.length}
+            </span>
+          )}
         </h3>
         {passes.length === 0 ? (
           <div className="detail-empty">Sin pases en la ventana</div>
         ) : (
           <ul className="alert-list">
-            {passes.slice(0, 10).map((p, i) => (
+            {passes.slice(0, 8).map((p, i) => (
               <li key={`${p.norad_id}-${p.aoi_id}-${i}`} className={`alert-item severity-${p.priority}`}>
                 <div className="alert-title">
                   {p.satellite_name} → {p.aoi_name}
                 </div>
                 <div className="alert-meta">
-                  {fmtTime(p.enter_utc)}–{fmtTime(p.exit_utc)} UTC · {Math.round(p.duration_s / 60)} min
+                  {fmtTime(p.enter_utc)}–{fmtTime(p.exit_utc)} · {Math.round(p.duration_s / 60)} min
                   {p.ongoing ? " · EN CURSO" : ""}
                 </div>
               </li>
@@ -137,14 +152,28 @@ export function SidePanel() {
               <span className="v">{selectedSatellite.norad_id ?? "—"}</span>
             </div>
             <div className="detail-row">
-              <span className="k">Lat / Lon</span>
-              <span className="v">
-                {selectedSatellite.latitude.toFixed(4)}°, {selectedSatellite.longitude.toFixed(4)}°
-              </span>
-            </div>
-            <div className="detail-row">
               <span className="k">Altitud</span>
               <span className="v">{selectedSatellite.altitude_km.toFixed(1)} km</span>
+            </div>
+            {track?.classification && (
+              <>
+                <div className="detail-row">
+                  <span className="k">Categoría</span>
+                  <span className="v">{track.classification.category}</span>
+                </div>
+                {track.classification.high_interest && (
+                  <div className="detail-row">
+                    <span className="k">Interés</span>
+                    <span className="v" style={{ color: "#e05c5c" }}>
+                      ALTO
+                    </span>
+                  </div>
+                )}
+              </>
+            )}
+            <div className="detail-row">
+              <span className="k">Traza</span>
+              <span className="v">{track ? `${track.segments.length} seg.` : "cargando…"}</span>
             </div>
           </>
         )}
@@ -179,7 +208,9 @@ export function SidePanel() {
           </>
         )}
         {!selectedSatellite && !selectedCamera && !selectedAOI && (
-          <div className="detail-empty">Selecciona un activo en el mapa.</div>
+          <div className="detail-empty">
+            Click en un satélite para ver traza y clasificación.
+          </div>
         )}
       </div>
     </aside>
