@@ -17,44 +17,34 @@ Documentación automática: http://localhost:8000/docs
 | `GET /` | Estado del sistema |
 | `GET /health` | Health check |
 | `GET /satellite/groups` | Grupos de TLE disponibles |
-| `GET /satellite/tle/{group}` | Descarga y parsea TLE de un grupo |
-| `GET /satellite/position?line1=...&line2=...&name=...` | **Posición geodésica** de un satélite (lat/lon/alt) |
-| `GET /satellite/positions/{group}?limit=50` | **Batch** de posiciones geodésicas listas para mapa |
-| `GET /satellite/propagate?...` | Legacy (ahora también devuelve geodésicas) |
+| `GET /satellite/tle/{group}` | TLE parseado (con caché) |
+| `GET /satellite/position?...` | Posición geodésica de un satélite |
+| `GET /satellite/positions/{group}` | **Batch** de posiciones listas para mapa |
+| `GET /satellite/cache/stats` | Estado de la caché de TLE |
+| `DELETE /satellite/cache` | Limpiar caché |
+| `WS /ws/satellite/positions?group=stations&interval=5` | **Stream en vivo** de posiciones |
 
-### Ejemplo de respuesta (`/satellite/positions/stations`)
+### Ejemplo WebSocket
 
-```json
-{
-  "group": "stations",
-  "count": 12,
-  "timestamp_utc": "2026-10-30T02:15:00+00:00",
-  "satellites": [
-    {
-      "name": "ISS (ZARYA)",
-      "norad_id": "25544",
-      "latitude": -12.345678,
-      "longitude": -45.678901,
-      "altitude_km": 421.5,
-      "speed_km_s": 7.66,
-      "timestamp_utc": "2026-10-30T02:15:00+00:00"
-    }
-  ]
-}
+```javascript
+const ws = new WebSocket("ws://localhost:8000/ws/satellite/positions?group=stations&interval=5");
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  console.log(data.count, "satélites actualizados");
+};
 ```
 
-## Estado actual
+## Arquitectura actual
 
-- ✅ Propagación SGP4 + skyfield
-- ✅ Conversión ECI → latitud / longitud / altitud
-- ✅ Endpoint batch listo para mapa táctico
-- ⏳ Caché de TLE
-- ⏳ WebSocket de posiciones en vivo
-- ⏳ Módulo de cámaras públicas
+- **Propagación**: sgp4 + skyfield → lat/lon/alt listos para mapa
+- **Caché TLE**: en memoria, TTL 2 horas
+- **Realtime**: WebSocket con push periódico
 
-## Próximos pasos
+## Estado
 
-1. Caché en memoria / Redis de grupos TLE
-2. WebSocket `/ws/satellite/positions`
-3. Módulo de cámaras (Surface OSINT)
-4. Frontend táctico (MapLibre / Cesium)
+- [x] Propagación geodésica
+- [x] Batch positions
+- [x] Caché de TLE
+- [x] WebSocket de posiciones en vivo
+- [ ] Módulo de cámaras públicas
+- [ ] Frontend táctico
