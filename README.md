@@ -1,78 +1,54 @@
 # SOFTWARE AVANZADO
 
-**Sistema de Inteligencia, Vigilancia y Reconocimiento (ISR) en Tiempo Real**
+**Sistema ISR en tiempo real — cuadro de mando táctico unificado**
 
-Plataforma privada orientada a operaciones de conciencia situacional militar. Integra tracking satelital global y feeds de cámaras públicas en un **cuadro de mando táctico unificado**.
-
----
-
-## Concepto
-
-- **ISR** (Intelligence, Surveillance, Reconnaissance)
-- Conciencia situacional en tiempo real
-- Sensores espaciales + sensores terrestres abiertos (OSINT)
-- Un solo panel: mapa táctico + capas de satélites + cámaras
+Satélites + cámaras públicas + zonas de interés (AOI) en un solo panel.
 
 ---
 
-## Arquitectura actual (v0.4)
+## Arquitectura (v0.5)
 
 ```
-┌─────────────────────────────────────────────────────┐
-│           Cuadro de Mando Táctico (React)           │
-│  MapLibre · capas satélites + cámaras · panel detalle│
-└───────────────────────┬─────────────────────────────┘
-                        │ REST + WebSocket
-┌───────────────────────▼─────────────────────────────┐
-│              Backend FastAPI (Python)               │
-│  /satellite/*  ·  /cameras/*  ·  /ws/satellite/*    │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│         Cuadro de Mando Táctico (React + MapLibre)       │
+│   Capas: Satélites · Cámaras · AOI · Detalle unificado   │
+└──────────────────────────┬───────────────────────────────┘
+                           │ REST + WebSocket
+┌──────────────────────────▼───────────────────────────────┐
+│                   Backend FastAPI                        │
+│  /satellite/*  ·  /cameras/*  ·  /aoi/*  ·  /ws/*        │
+└──────────────────────────────────────────────────────────┘
 ```
 
-### Backend
-- Propagación SGP4 + skyfield → lat/lon/alt
-- Caché TLE (TTL 2h)
-- WebSocket de posiciones en vivo
-- API de cámaras públicas con filtros geográficos
-
-### Frontend (`frontend/tactical-map`)
-- React + TypeScript + MapLibre + Zustand
-- Mapa oscuro táctico
-- Capas unificadas (satélites verdes / cámaras naranja)
-- Selector de grupo orbital
-- Detalle al click + barra de estado LIVE
-
----
-
-## Arranque completo
+## Arranque
 
 ```bash
 # Backend
-cd backend
-pip install -r requirements.txt
+cd backend && pip install -r requirements.txt
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
-# Frontend (otra terminal)
-cd frontend/tactical-map
-npm install
-npm run dev
+# Frontend
+cd frontend/tactical-map && npm install && npm run dev
 ```
 
-- API docs: http://localhost:8000/docs  
-- Cuadro de mando: http://localhost:5173
+- Panel: http://localhost:5173  
+- API: http://localhost:8000/docs
 
----
+## Capas del mapa
 
-## Estado (v0.4)
+| Capa | Color | Fuente |
+|------|-------|--------|
+| Satélites | Verde | WebSocket en vivo |
+| Cámaras | Naranja | `/cameras` |
+| Zonas AOI | Según prioridad | `/aoi` |
 
-- [x] Backend satelital (posiciones geodésicas + caché + WebSocket)
-- [x] Módulo de cámaras (Surface OSINT)
-- [x] **Cuadro de mando táctico unificado** (satélites + cámaras en el mismo mapa)
-- [ ] Más fuentes de cámaras
-- [ ] Zonas de interés / alertas
+## Estado
+
+- [x] Space Domain (SGP4 + caché + WebSocket)
+- [x] Surface OSINT (cámaras georreferenciadas)
+- [x] Zonas de interés (AOI)
+- [x] Cuadro de mando unificado
+- [ ] Alertas (satélite sobre AOI)
 - [ ] Docker
 
----
-
-**Clasificación:** Uso privado / desarrollo interno  
-**Enfoque:** Conciencia situacional integrada — dominio espacial + superficie
+**Clasificación:** Uso privado / desarrollo interno
