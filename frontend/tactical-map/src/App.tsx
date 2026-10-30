@@ -2,7 +2,13 @@ import { useEffect, useRef } from "react";
 import { MapCanvas } from "./components/MapCanvas";
 import { SidePanel } from "./components/SidePanel";
 import { useTacticalStore } from "./store";
-import { fetchCameras, fetchAOIs, fetchAlerts, positionsWebSocketUrl } from "./api";
+import {
+  fetchCameras,
+  fetchAOIs,
+  fetchAlerts,
+  fetchPasses,
+  positionsWebSocketUrl,
+} from "./api";
 import type { PositionsMessage } from "./types";
 
 export default function App() {
@@ -13,11 +19,13 @@ export default function App() {
     cameras,
     aois,
     alerts,
+    passes,
     satelliteGroup,
     setSatellites,
     setCameras,
     setAOIs,
     setAlerts,
+    setPasses,
     setConnection,
   } = useTacticalStore();
 
@@ -33,11 +41,11 @@ export default function App() {
       .catch((err) => console.error("aoi", err));
   }, [setCameras, setAOIs]);
 
-  // Alertas: refresco periódico alineado al grupo
+  // Alertas (cada 15s) + pases (cada 5 min)
   useEffect(() => {
     let cancelled = false;
 
-    async function refresh() {
+    async function refreshAlerts() {
       try {
         const list = await fetchAlerts(satelliteGroup, 200);
         if (!cancelled) setAlerts(list);
@@ -46,13 +54,25 @@ export default function App() {
       }
     }
 
-    refresh();
-    const id = window.setInterval(refresh, 15000);
+    async function refreshPasses() {
+      try {
+        const list = await fetchPasses(satelliteGroup, 6, 25);
+        if (!cancelled) setPasses(list);
+      } catch (err) {
+        console.error("passes", err);
+      }
+    }
+
+    refreshAlerts();
+    refreshPasses();
+    const aId = window.setInterval(refreshAlerts, 15000);
+    const pId = window.setInterval(refreshPasses, 5 * 60 * 1000);
     return () => {
       cancelled = true;
-      clearInterval(id);
+      clearInterval(aId);
+      clearInterval(pId);
     };
-  }, [satelliteGroup, setAlerts]);
+  }, [satelliteGroup, setAlerts, setPasses]);
 
   useEffect(() => {
     let closed = false;
@@ -145,6 +165,8 @@ export default function App() {
           AOI <strong>{aois.length}</strong>
           {" · "}
           ALT <strong>{alerts.length}</strong>
+          {" · "}
+          PAS <strong>{passes.length}</strong>
         </span>
         <span>
           UTC{" "}
