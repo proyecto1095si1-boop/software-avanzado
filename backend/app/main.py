@@ -8,11 +8,12 @@ from app.api.aoi import router as aoi_router
 from app.api.alerts import router as alerts_router
 from app.api.passes import router as passes_router
 from app.api.track import router as track_router
+from app.api.system import router as system_router
 
 app = FastAPI(
     title="Software Avanzado - ISR System",
     description="Sistema de Inteligencia, Vigilancia y Reconocimiento en tiempo real",
-    version="0.8.0",
+    version="0.8.1",
 )
 
 app.add_middleware(
@@ -23,6 +24,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# --- Rutas internas unificadas ---
+app.include_router(system_router)
 app.include_router(satellite_router)
 app.include_router(passes_router)
 app.include_router(track_router)
@@ -37,8 +40,10 @@ def root():
     return {
         "system": "Software Avanzado",
         "type": "ISR / SDA + OSINT + AOI + Alerts + Passes + Tracks",
-        "version": "0.8.0",
+        "version": "0.8.1",
         "status": "online",
+        "docs": "/docs",
+        "integrations": "/system/status",
         "modules": [
             "satellite",
             "passes",
