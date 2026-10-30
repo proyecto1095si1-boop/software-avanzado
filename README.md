@@ -1,40 +1,86 @@
 # SOFTWARE AVANZADO
 
-**Sistema ISR en tiempo real — cuadro de mando táctico unificado**
+**Sistema ISR unificado** — satélites, cámaras, AOI, alertas, pases y trazas en un solo cuadro de mando.
+
+---
 
 ## Arranque
 
 ```bash
+# Todo junto
 docker compose up --build
-# Panel http://localhost:5173 · API http://localhost:8000/docs
+
+# O en desarrollo
+cd backend && pip install -r requirements.txt && uvicorn app.main:app --reload --port 8000
+cd frontend/tactical-map && npm install && npm run dev
 ```
 
-## Capacidades (v0.8)
+| Servicio | URL |
+|----------|-----|
+| Cuadro de mando | http://localhost:5173 |
+| API + docs | http://localhost:8000/docs |
+| **Estado integraciones** | http://localhost:8000/system/status |
 
-| Módulo | Qué hace |
-|--------|----------|
-| Space Domain | TLE + SGP4/skyfield → posiciones LIVE |
-| Ground track | Traza orbital al seleccionar un satélite |
-| Clasificación | military / recon / nav / weather / station… |
-| Alertas | Satélite **ahora** dentro de AOI |
-| Pases | Predicción de entradas/salidas sobre AOI |
-| Surface OSINT | Cámaras públicas |
-| AOI | Zonas estratégicas (BA, Malvinas, Gibraltar, Panamá, Suez, Ormuz, Taiwán…) |
-| Docker | Backend + panel de un comando |
+---
 
-### Flujo táctico en el panel
+## Qué está conectado internamente
 
-1. Elegí grupo (`stations`, `military`, `starlink`…)
-2. Mapa LIVE de satélites + cámaras + polígonos AOI
-3. **Click en satélite** → traza orbital + categoría + interés alto
-4. Alertas actuales y pases próximos en el lateral
+```
+Frontend (panel)  ──proxy──►  Backend FastAPI
+                                 │
+         ┌───────────────────────┼───────────────────────┐
+         ▼                       ▼                       ▼
+   /satellite/*            /cameras  /aoi          /alerts /ws
+   /passes /track              │                       │
+         │                     │                       │
+         ▼                     ▼                       ▼
+   CelesTrak (TLE)      inventario local         motor AOI
+```
 
-### API útil
+Todo el frontend habla **solo** con tu backend. El backend es el que habla con el exterior.
 
-- `GET /satellite/track/{group}/{norad_id}` — traza
-- `GET /satellite/classified/{group}` — posiciones + categoría
-- `GET /satellite/passes?hours=6` — pases
-- `GET /alerts/check` — cruces actuales
-- `WS /ws/satellite/positions` — stream
+---
+
+## APIs externas — cuáles necesitás
+
+| API | ¿Obligatoria? | Estado | Dónde poner la clave |
+|-----|---------------|--------|----------------------|
+| **CelesTrak** | Sí | **Ya conectada** | No requiere clave |
+| **Space-Track** | No | Lista para cablear | `backend/.env` → `SPACETRACK_USER/PASSWORD` |
+| **N2YO** | No | Lista | `N2YO_API_KEY` |
+| **ADS-B** (aviones) | No | Lista | `ADSB_API_URL` / `ADSB_API_KEY` |
+| **AIS** (buques) | No | Lista | `AIS_API_URL` / `AIS_API_KEY` |
+| **Lista cámaras** | No | Semilla local | `CAMERA_LIST_URL` |
+| **Shodan** | No | Lista | `SHODAN_API_KEY` |
+
+### Cómo agregar una clave
+
+```bash
+cd backend
+cp .env.example .env
+# editá .env
+```
+
+Reiniciá el backend y mirá: **http://localhost:8000/system/status**
+
+Guía detallada: **[docs/apis.md](docs/apis.md)**
+
+### Prioridad recomendada
+
+1. **Nada extra** — con CelesTrak el sistema ya opera  
+2. **Space-Track** — TLE más robustos  
+3. **ADS-B** (ideal feed propio) — capa aviones  
+4. **CAMERA_LIST_URL** — más cámaras sin tocar código  
+
+---
+
+## Capacidades del panel
+
+- Satélites LIVE (WebSocket)  
+- Trazas orbitales al click  
+- Clasificación táctica  
+- Cámaras + AOI estratégicas  
+- Alertas (satélite sobre zona)  
+- Pases previstos  
 
 **Clasificación:** Uso privado / desarrollo interno
