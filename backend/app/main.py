@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.satellite import router as satellite_router
+
 app = FastAPI(
     title="Software Avanzado - ISR System",
     description="Sistema de Inteligencia, Vigilancia y Reconocimiento en tiempo real",
@@ -14,6 +16,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(satellite_router)
 
 
 @app.get("/")
