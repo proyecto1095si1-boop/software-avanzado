@@ -52,9 +52,9 @@ No es un juguete civil. Está pensado como núcleo de un **sistema de apoyo a la
 
 | Capa              | Tecnología recomendada                          |
 |-------------------|-------------------------------------------------|
-| Backend           | Python / FastAPI o Node.js                      |
-| Orbital Mechanics | satellite.js / Orekit / SGP4                    |
-| Frontend          | React + Cesium / MapLibre / Three.js            |
+| Backend           | Python / FastAPI                                |
+| Orbital Mechanics | sgp4 + skyfield                                 |
+| Frontend          | React + MapLibre / Cesium                       |
 | Datos TLE         | CelesTrak + Space-Track.org                     |
 | Cámaras           | Agregadores open-source + listas públicas       |
 | Base de datos     | PostgreSQL + PostGIS                            |
@@ -68,46 +68,31 @@ No es un juguete civil. Está pensado como núcleo de un **sistema de apoyo a la
 - [ShenMian/tracker](https://github.com/ShenMian/tracker)
 - [dsuarezv/satellite-tracker](https://github.com/dsuarezv/satellite-tracker)
 - [satvisorcom/satvisor](https://github.com/satvisorcom/satvisor)
-- [BigBodyCobain/Shadowbroker](https://github.com/BigBodyCobain/Shadowbroker)
 
 **Cámaras públicas:**
 - [SoCloseSociety/camforge](https://github.com/SoCloseSociety/camforge)
-- [Phaviwylera/godseye](https://github.com/Phaviwylera/godseye)
-- [thevibegarage/globescope](https://github.com/thevibegarage/globescope)
 
 **Combinados / OSINT militar-civil:**
 - [bilawalsidhu/gods-eye-view](https://github.com/bilawalsidhu/gods-eye-view)
 
 ---
 
-## Estructura del Repositorio (próxima)
+## Estado Actual (v0.1)
 
-```
-software-avanzado/
-├── README.md
-├── docs/
-│   └── arquitectura.md
-├── backend/
-│   ├── satellite/
-│   ├── cameras/
-│   └── api/
-├── frontend/
-│   └── tactical-map/
-├── data/
-│   ├── tle/
-│   └── camera-lists/
-└── docker/
-```
+- [x] Repositorio privado creado
+- [x] Concepto militar / ISR definido
+- [x] Backend FastAPI operativo
+- [x] Descarga y parseo de TLE desde CelesTrak
+- [x] Propagación SGP4 + skyfield
+- [x] **Conversión ECI → latitud / longitud / altitud**
+- [x] Endpoint de posición individual lista para mapa
+- [x] Endpoint batch de posiciones (`/satellite/positions/{group}`)
+- [ ] Caché de TLE
+- [ ] WebSocket de posiciones en vivo
+- [ ] Módulo de cámaras públicas
+- [ ] Frontend táctico (MapLibre / Cesium)
 
----
-
-## Estado Actual
-
-- Repositorio privado creado
-- Concepto militar / ISR definido
-- Roadmap de módulos establecido
-
-**Siguiente paso:** Definir el stack exacto y empezar a implementar el núcleo de tracking satelital + mapa táctico.
+**Siguiente paso:** Caché de TLE + WebSocket o empezar el módulo de cámaras / frontend táctico.
 
 ---
 
