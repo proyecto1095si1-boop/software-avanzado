@@ -1,11 +1,19 @@
 import { create } from "zustand";
-import type { Camera, SatellitePosition, ConnectionStatus, AOI, Alert } from "./types";
+import type {
+  Camera,
+  SatellitePosition,
+  ConnectionStatus,
+  AOI,
+  Alert,
+  Pass,
+} from "./types";
 
 interface TacticalState {
   satellites: SatellitePosition[];
   cameras: Camera[];
   aois: AOI[];
   alerts: Alert[];
+  passes: Pass[];
   lastUpdate: string | null;
   connection: ConnectionStatus;
   satelliteGroup: string;
@@ -22,6 +30,7 @@ interface TacticalState {
   setCameras: (cams: Camera[]) => void;
   setAOIs: (aois: AOI[]) => void;
   setAlerts: (alerts: Alert[]) => void;
+  setPasses: (passes: Pass[]) => void;
   setConnection: (status: ConnectionStatus) => void;
   setSatelliteGroup: (group: string) => void;
   toggleSatellites: () => void;
@@ -37,6 +46,7 @@ export const useTacticalStore = create<TacticalState>((set) => ({
   cameras: [],
   aois: [],
   alerts: [],
+  passes: [],
   lastUpdate: null,
   connection: "offline",
   satelliteGroup: "stations",
@@ -57,6 +67,7 @@ export const useTacticalStore = create<TacticalState>((set) => ({
   setCameras: (cams) => set({ cameras: cams }),
   setAOIs: (aois) => set({ aois }),
   setAlerts: (alerts) => set({ alerts }),
+  setPasses: (passes) => set({ passes }),
   setConnection: (status) => set({ connection: status }),
   setSatelliteGroup: (group) => set({ satelliteGroup: group }),
   toggleSatellites: () => set((s) => ({ showSatellites: !s.showSatellites })),
