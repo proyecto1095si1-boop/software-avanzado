@@ -1,6 +1,6 @@
-import type { Camera, SatellitePosition } from "./types";
+import type { Camera, SatellitePosition, AOI } from "./types";
 
-const BASE = ""; // proxy de Vite en dev
+const BASE = "";
 
 export async function fetchCameras(params?: {
   country?: string;
@@ -16,6 +16,13 @@ export async function fetchCameras(params?: {
   if (!res.ok) throw new Error(`cameras ${res.status}`);
   const data = await res.json();
   return data.cameras ?? [];
+}
+
+export async function fetchAOIs(): Promise<AOI[]> {
+  const res = await fetch(`${BASE}/aoi`);
+  if (!res.ok) throw new Error(`aoi ${res.status}`);
+  const data = await res.json();
+  return data.aois ?? [];
 }
 
 export async function fetchPositions(
