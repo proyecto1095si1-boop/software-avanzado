@@ -9,6 +9,7 @@ export default defineConfig({
       "/satellite": "http://localhost:8000",
       "/cameras": "http://localhost:8000",
       "/aoi": "http://localhost:8000",
+      "/alerts": "http://localhost:8000",
       "/ws": {
         target: "ws://localhost:8000",
         ws: true,
