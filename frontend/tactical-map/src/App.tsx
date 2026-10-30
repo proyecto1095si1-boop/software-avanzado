@@ -7,6 +7,7 @@ import {
   fetchAOIs,
   fetchAlerts,
   fetchPasses,
+  fetchTrack,
   positionsWebSocketUrl,
 } from "./api";
 import type { PositionsMessage } from "./types";
@@ -21,11 +22,13 @@ export default function App() {
     alerts,
     passes,
     satelliteGroup,
+    selectedSatellite,
     setSatellites,
     setCameras,
     setAOIs,
     setAlerts,
     setPasses,
+    setTrack,
     setConnection,
   } = useTacticalStore();
 
@@ -33,15 +36,10 @@ export default function App() {
   const retryRef = useRef<number>(0);
 
   useEffect(() => {
-    fetchCameras()
-      .then(setCameras)
-      .catch((err) => console.error("cameras", err));
-    fetchAOIs()
-      .then(setAOIs)
-      .catch((err) => console.error("aoi", err));
+    fetchCameras().then(setCameras).catch((e) => console.error("cameras", e));
+    fetchAOIs().then(setAOIs).catch((e) => console.error("aoi", e));
   }, [setCameras, setAOIs]);
 
-  // Alertas (cada 15s) + pases (cada 5 min)
   useEffect(() => {
     let cancelled = false;
 
@@ -74,6 +72,34 @@ export default function App() {
     };
   }, [satelliteGroup, setAlerts, setPasses]);
 
+  // Traza al seleccionar satélite
+  useEffect(() => {
+    if (!selectedSatellite) {
+      setTrack(null);
+      return;
+    }
+    const key = selectedSatellite.norad_id || selectedSatellite.name;
+    let cancelled = false;
+    fetchTrack(satelliteGroup, key)
+      .then((t) => {
+        if (!cancelled) {
+          setTrack({
+            name: t.name,
+            norad_id: t.norad_id,
+            segments: t.segments,
+            classification: t.classification,
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("track", err);
+        if (!cancelled) setTrack(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedSatellite, satelliteGroup, setTrack]);
+
   useEffect(() => {
     let closed = false;
     let timer: number | undefined;
@@ -81,7 +107,6 @@ export default function App() {
     function connect() {
       if (closed) return;
       setConnection(retryRef.current > 0 ? "reconnecting" : "connecting");
-
       const url = positionsWebSocketUrl(satelliteGroup, 5, 200);
       const ws = new WebSocket(url);
       wsRef.current = ws;
@@ -90,7 +115,6 @@ export default function App() {
         retryRef.current = 0;
         setConnection("live");
       };
-
       ws.onmessage = (ev) => {
         try {
           const msg: PositionsMessage = JSON.parse(ev.data);
@@ -101,7 +125,6 @@ export default function App() {
           /* ignore */
         }
       };
-
       ws.onclose = () => {
         setConnection("offline");
         if (closed) return;
@@ -109,12 +132,10 @@ export default function App() {
         retryRef.current += 1;
         timer = window.setTimeout(connect, delay);
       };
-
       ws.onerror = () => ws.close();
     }
 
     connect();
-
     return () => {
       closed = true;
       if (timer) clearTimeout(timer);
