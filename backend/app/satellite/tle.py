@@ -1,10 +1,13 @@
 """
 Módulo de obtención y parseo de TLE (Two-Line Element sets)
 Fuente principal: CelesTrak (público)
+Con caché en memoria (TTL 2h).
 """
 
 import httpx
 from typing import List, Dict
+
+from app.satellite.cache import get_cached, set_cached
 
 CELESTRAK_BASE = "https://celestrak.org/NORAD/elements/gp.php"
 
@@ -31,7 +34,6 @@ def parse_tle(raw: str) -> List[Dict]:
 
     i = 0
     while i < len(lines):
-        # Formato estándar: nombre + 2 líneas
         if i + 2 < len(lines) and lines[i + 1].startswith("1 ") and lines[i + 2].startswith("2 "):
             name = lines[i]
             line1 = lines[i + 1]
@@ -47,4 +49,19 @@ def parse_tle(raw: str) -> List[Dict]:
         else:
             i += 1
 
+    return satellites
+
+
+async def get_satellites(group: str = "stations", force_refresh: bool = False) -> List[Dict]:
+    """
+    Obtiene la lista de satélites de un grupo, usando caché si está disponible.
+    """
+    if not force_refresh:
+        cached = await get_cached(group)
+        if cached is not None:
+            return cached
+
+    raw = await fetch_tle_group(group)
+    satellites = parse_tle(raw)
+    await set_cached(group, satellites)
     return satellites
