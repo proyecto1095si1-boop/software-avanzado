@@ -47,6 +47,19 @@ export interface Alert {
   timestamp_utc: string;
 }
 
+export interface Pass {
+  satellite_name: string;
+  norad_id?: string | null;
+  aoi_id: string;
+  aoi_name: string;
+  enter_utc: string;
+  exit_utc: string;
+  duration_s: number;
+  max_altitude_km: number;
+  priority: string;
+  ongoing?: boolean;
+}
+
 export interface PositionsMessage {
   type: "positions" | "error";
   group?: string;
