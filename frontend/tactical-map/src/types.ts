@@ -31,6 +31,22 @@ export interface AOI {
   priority: string;
 }
 
+export interface Alert {
+  id: string;
+  type: string;
+  severity: string;
+  title: string;
+  message: string;
+  satellite_name: string;
+  satellite_norad?: string | null;
+  aoi_id: string;
+  aoi_name: string;
+  latitude: number;
+  longitude: number;
+  altitude_km: number;
+  timestamp_utc: string;
+}
+
 export interface PositionsMessage {
   type: "positions" | "error";
   group?: string;
