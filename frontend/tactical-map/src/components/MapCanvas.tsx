@@ -8,9 +8,15 @@ const CAM_SOURCE = "cameras";
 const AOI_SOURCE = "aois";
 const TRACK_SOURCE = "track";
 
-// Basemap oscuro sin API key (ArcGIS usa {z}/{y}/{x})
-const BASEMAP_TILES =
-  "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}";
+// CARTO basemap (MapLibre style) — key del proyecto
+const CARTO_KEY =
+  import.meta.env.VITE_CARTO_KEY ||
+  "cb1_4ygv_1_8fe98e0cb50c8ca5f8ca348e";
+
+// dark-matter = oscuro táctico | voyager-gl = claro
+const CARTO_STYLE =
+  import.meta.env.VITE_CARTO_STYLE ||
+  `https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json?key=${CARTO_KEY}`;
 
 function satsToGeoJSON(sats: SatellitePosition[]) {
   return {
@@ -110,18 +116,7 @@ export function MapCanvas() {
 
     const map = new maplibregl.Map({
       container: containerRef.current,
-      style: {
-        version: 8,
-        sources: {
-          basemap: {
-            type: "raster",
-            tiles: [BASEMAP_TILES],
-            tileSize: 256,
-            attribution: "© Esri",
-          },
-        },
-        layers: [{ id: "basemap", type: "raster", source: "basemap" }],
-      },
+      style: CARTO_STYLE,
       center: [0, 20],
       zoom: 1.4,
       attributionControl: false,
