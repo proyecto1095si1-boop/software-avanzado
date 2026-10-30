@@ -48,17 +48,18 @@ No es un juguete civil. Está pensado como núcleo de un **sistema de apoyo a la
 
 ---
 
-## Stack Tecnológico Previsto
+## Stack Tecnológico
 
-| Capa              | Tecnología recomendada                          |
-|-------------------|-------------------------------------------------|
-| Backend           | Python / FastAPI                                |
-| Orbital Mechanics | sgp4 + skyfield                                 |
-| Frontend          | React + MapLibre / Cesium                       |
-| Datos TLE         | CelesTrak + Space-Track.org                     |
-| Cámaras           | Agregadores open-source + listas públicas       |
-| Base de datos     | PostgreSQL + PostGIS                            |
-| Despliegue        | Docker + self-hosted                            |
+| Capa              | Tecnología                                  |
+|-------------------|---------------------------------------------|
+| Backend           | Python / FastAPI                            |
+| Orbital Mechanics | sgp4 + skyfield                             |
+| Realtime          | WebSocket                                   |
+| Frontend          | React + MapLibre / Cesium (próximo)         |
+| Datos TLE         | CelesTrak                                   |
+| Cámaras           | Agregadores open-source + listas públicas   |
+| Base de datos     | PostgreSQL + PostGIS (próximo)              |
+| Despliegue        | Docker + self-hosted (próximo)              |
 
 ---
 
@@ -66,33 +67,32 @@ No es un juguete civil. Está pensado como núcleo de un **sistema de apoyo a la
 
 **Satélites:**
 - [ShenMian/tracker](https://github.com/ShenMian/tracker)
-- [dsuarezv/satellite-tracker](https://github.com/dsuarezv/satellite-tracker)
 - [satvisorcom/satvisor](https://github.com/satvisorcom/satvisor)
 
 **Cámaras públicas:**
 - [SoCloseSociety/camforge](https://github.com/SoCloseSociety/camforge)
 
-**Combinados / OSINT militar-civil:**
+**Combinados / OSINT:**
 - [bilawalsidhu/gods-eye-view](https://github.com/bilawalsidhu/gods-eye-view)
 
 ---
 
-## Estado Actual (v0.1)
+## Estado Actual (v0.2)
 
 - [x] Repositorio privado creado
 - [x] Concepto militar / ISR definido
 - [x] Backend FastAPI operativo
 - [x] Descarga y parseo de TLE desde CelesTrak
 - [x] Propagación SGP4 + skyfield
-- [x] **Conversión ECI → latitud / longitud / altitud**
+- [x] Conversión ECI → latitud / longitud / altitud
 - [x] Endpoint de posición individual lista para mapa
 - [x] Endpoint batch de posiciones (`/satellite/positions/{group}`)
-- [ ] Caché de TLE
-- [ ] WebSocket de posiciones en vivo
+- [x] **Caché de TLE en memoria (TTL 2h)**
+- [x] **WebSocket de posiciones en vivo** (`/ws/satellite/positions`)
 - [ ] Módulo de cámaras públicas
 - [ ] Frontend táctico (MapLibre / Cesium)
 
-**Siguiente paso:** Caché de TLE + WebSocket o empezar el módulo de cámaras / frontend táctico.
+**Siguiente paso:** Módulo de cámaras (Surface OSINT) o frontend táctico mínimo.
 
 ---
 
