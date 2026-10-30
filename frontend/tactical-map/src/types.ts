@@ -22,6 +22,15 @@ export interface Camera {
   notes?: string | null;
 }
 
+export interface AOI {
+  id: string;
+  name: string;
+  description?: string | null;
+  coordinates: number[][];
+  color: string;
+  priority: string;
+}
+
 export interface PositionsMessage {
   type: "positions" | "error";
   group?: string;
