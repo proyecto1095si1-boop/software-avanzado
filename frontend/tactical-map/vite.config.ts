@@ -1,20 +1,25 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
+const backend = "http://localhost:8000";
+
 export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
     proxy: {
-      "/satellite": "http://localhost:8000",
-      "/cameras": "http://localhost:8000",
-      "/aoi": "http://localhost:8000",
-      "/alerts": "http://localhost:8000",
+      "/satellite": backend,
+      "/cameras": backend,
+      "/aoi": backend,
+      "/alerts": backend,
+      "/system": backend,
+      "/health": backend,
+      "/docs": backend,
+      "/openapi.json": backend,
       "/ws": {
         target: "ws://localhost:8000",
         ws: true,
       },
-      "/health": "http://localhost:8000",
     },
   },
 });
