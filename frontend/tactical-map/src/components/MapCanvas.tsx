@@ -6,6 +6,7 @@ import type { SatellitePosition, Camera, AOI } from "../types";
 const SAT_SOURCE = "satellites";
 const CAM_SOURCE = "cameras";
 const AOI_SOURCE = "aois";
+const TRACK_SOURCE = "track";
 
 function satsToGeoJSON(sats: SatellitePosition[]) {
   return {
@@ -67,6 +68,23 @@ function aoisToGeoJSON(aois: AOI[]) {
   };
 }
 
+function trackToGeoJSON(segments: number[][][] | undefined) {
+  if (!segments?.length) {
+    return { type: "FeatureCollection" as const, features: [] };
+  }
+  return {
+    type: "FeatureCollection" as const,
+    features: segments.map((coords) => ({
+      type: "Feature" as const,
+      properties: {},
+      geometry: {
+        type: "LineString" as const,
+        coordinates: coords,
+      },
+    })),
+  };
+}
+
 export function MapCanvas() {
   const mapRef = useRef<maplibregl.Map | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -74,9 +92,11 @@ export function MapCanvas() {
   const satellites = useTacticalStore((s) => s.satellites);
   const cameras = useTacticalStore((s) => s.cameras);
   const aois = useTacticalStore((s) => s.aois);
+  const track = useTacticalStore((s) => s.track);
   const showSatellites = useTacticalStore((s) => s.showSatellites);
   const showCameras = useTacticalStore((s) => s.showCameras);
   const showAOIs = useTacticalStore((s) => s.showAOIs);
+  const showTrack = useTacticalStore((s) => s.showTrack);
   const selectSatellite = useTacticalStore((s) => s.selectSatellite);
   const selectCamera = useTacticalStore((s) => s.selectCamera);
   const selectAOI = useTacticalStore((s) => s.selectAOI);
@@ -107,6 +127,7 @@ export function MapCanvas() {
 
     map.on("load", () => {
       map.addSource(AOI_SOURCE, { type: "geojson", data: aoisToGeoJSON([]) });
+      map.addSource(TRACK_SOURCE, { type: "geojson", data: trackToGeoJSON([]) });
       map.addSource(SAT_SOURCE, { type: "geojson", data: satsToGeoJSON([]) });
       map.addSource(CAM_SOURCE, { type: "geojson", data: camsToGeoJSON([]) });
 
@@ -114,10 +135,7 @@ export function MapCanvas() {
         id: "aois-fill",
         type: "fill",
         source: AOI_SOURCE,
-        paint: {
-          "fill-color": ["get", "color"],
-          "fill-opacity": 0.18,
-        },
+        paint: { "fill-color": ["get", "color"], "fill-opacity": 0.18 },
       });
       map.addLayer({
         id: "aois-line",
@@ -127,6 +145,18 @@ export function MapCanvas() {
           "line-color": ["get", "color"],
           "line-width": 2,
           "line-opacity": 0.85,
+        },
+      });
+
+      map.addLayer({
+        id: "track-line",
+        type: "line",
+        source: TRACK_SOURCE,
+        paint: {
+          "line-color": "#5ce1a8",
+          "line-width": 2,
+          "line-opacity": 0.75,
+          "line-dasharray": [2, 1],
         },
       });
 
@@ -242,6 +272,15 @@ export function MapCanvas() {
       aoisToGeoJSON(showAOIs ? aois : [])
     );
   }, [aois, showAOIs]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map?.getSource(TRACK_SOURCE)) return;
+    const segments = showTrack && track ? track.segments : [];
+    (map.getSource(TRACK_SOURCE) as maplibregl.GeoJSONSource).setData(
+      trackToGeoJSON(segments)
+    );
+  }, [track, showTrack]);
 
   return <div ref={containerRef} className="map-wrap" />;
 }
