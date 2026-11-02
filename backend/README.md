@@ -10,6 +10,14 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 Documentación automática: http://localhost:8000/docs
 
+## Seguridad mínima
+
+Copiá `.env.example` a `.env`. En producción definí `APP_ENV=production`,
+`API_KEY`, `ADMIN_API_KEY` y una lista explícita en `CORS_ORIGINS`. Las
+operaciones administrativas, como limpiar la caché TLE, requieren
+`X-API-Key`. Si `API_KEY` está configurada, el WebSocket requiere el token
+`/ws/satellite/positions?token=...`.
+
 ## Módulos
 
 ### Satellite / Space Domain

@@ -4,6 +4,11 @@ services:
       context: ./backend
     ports:
       - "8000:8000"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     env_file:
       - path: ./backend/.env
         required: false

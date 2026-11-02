@@ -8,10 +8,8 @@ const CAM_SOURCE = "cameras";
 const AOI_SOURCE = "aois";
 const TRACK_SOURCE = "track";
 
-// CARTO basemap (MapLibre style) — key del proyecto
-const CARTO_KEY =
-  import.meta.env.VITE_CARTO_KEY ||
-  "cb1_4ygv_1_8fe98e0cb50c8ca5f8ca348e";
+// CARTO basemap (MapLibre style). Public tiles must be configured per deployment.
+const CARTO_KEY = import.meta.env.VITE_CARTO_KEY || "";
 
 // dark-matter = oscuro táctico | voyager-gl = claro
 const CARTO_STYLE =

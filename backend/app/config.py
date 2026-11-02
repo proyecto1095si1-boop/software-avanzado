@@ -5,7 +5,7 @@ Las claves se leen de variables de entorno (archivo .env en desarrollo).
 
 import os
 from functools import lru_cache
-from typing import Optional
+from typing import List, Optional
 
 try:
     from dotenv import load_dotenv
@@ -15,6 +15,17 @@ except ImportError:
 
 
 class Settings:
+    environment: str = os.getenv("APP_ENV", "development").lower()
+    app_name: str = os.getenv("APP_NAME", "Software Avanzado")
+    api_key: Optional[str] = os.getenv("API_KEY")
+    admin_api_key: Optional[str] = os.getenv("ADMIN_API_KEY")
+    allowed_origins: List[str] = [
+        origin.strip()
+        for origin in os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+        if origin.strip()
+    ]
+    docs_enabled: bool = os.getenv("ENABLE_API_DOCS", "true").lower() == "true"
+
     # --- Ya conectado (sin clave) ---
     celestrak_base: str = os.getenv(
         "CELESTRAK_BASE",
@@ -38,6 +49,10 @@ class Settings:
 
     # --- Sistema ---
     tle_cache_ttl_seconds: int = int(os.getenv("TLE_CACHE_TTL", str(2 * 60 * 60)))
+
+    @property
+    def is_production(self) -> bool:
+        return self.environment in {"production", "prod"}
 
     def status(self) -> dict:
         """Qué integraciones están configuradas (sin exponer secretos)."""
