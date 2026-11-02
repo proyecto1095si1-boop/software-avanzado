@@ -11,6 +11,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
 
 from app.satellite.tle import get_satellites
 from app.satellite.propagator import propagate_many
+from app.config import get_settings
 
 router = APIRouter(tags=["Realtime"])
 
@@ -21,6 +22,7 @@ async def ws_satellite_positions(
     group: str = Query("stations"),
     interval: float = Query(5.0, description="Segundos entre actualizaciones"),
     limit: Optional[int] = Query(None),
+    token: Optional[str] = Query(None, description="API key for protected deployments"),
 ):
     """
     Stream de posiciones geodésicas en vivo.
@@ -30,6 +32,10 @@ async def ws_satellite_positions(
     - interval: segundos entre pushes (mínimo 2)
     - limit: máximo de satélites
     """
+    settings = get_settings()
+    if settings.api_key and token != settings.api_key:
+        await websocket.close(code=1008, reason="Authentication required")
+        return
     await websocket.accept()
 
     # Limitar intervalo para no saturar

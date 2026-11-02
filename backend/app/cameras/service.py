@@ -3,6 +3,7 @@ Lógica de negocio del módulo de cámaras públicas.
 """
 
 from typing import List, Optional
+from fastapi import HTTPException
 from app.cameras.models import Camera, CameraType, CameraStatus
 from app.cameras.data import get_all_cameras
 
@@ -36,15 +37,21 @@ def list_cameras(
     if bbox is not None:
         try:
             parts = [float(x.strip()) for x in bbox.split(",")]
-            if len(parts) == 4:
-                min_lon, min_lat, max_lon, max_lat = parts
-                cameras = [
-                    c for c in cameras
-                    if min_lon <= c.longitude <= max_lon
-                    and min_lat <= c.latitude <= max_lat
-                ]
+            if len(parts) != 4:
+                raise ValueError
+            min_lon, min_lat, max_lon, max_lat = parts
         except ValueError:
-            pass  # bbox inválido → ignorar filtro
+            raise HTTPException(
+                status_code=400,
+                detail="bbox must contain four numeric values: min_lon,min_lat,max_lon,max_lat",
+            )
+        if not (-180 <= min_lon <= max_lon <= 180 and -90 <= min_lat <= max_lat <= 90):
+            raise HTTPException(status_code=400, detail="bbox coordinates are out of range")
+        cameras = [
+            c for c in cameras
+            if min_lon <= c.longitude <= max_lon
+            and min_lat <= c.latitude <= max_lat
+        ]
 
     return cameras
 

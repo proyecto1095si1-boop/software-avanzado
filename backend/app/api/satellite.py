@@ -1,11 +1,25 @@
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from typing import Optional
 
 from app.satellite.tle import get_satellites
 from app.satellite.propagator import propagate, propagate_many
 from app.satellite.cache import cache_stats, clear_cache
+from app.config import get_settings
 
 router = APIRouter(prefix="/satellite", tags=["Satellite / Space Domain"])
+
+
+async def require_admin_key(
+    x_api_key: Optional[str] = Header(default=None, alias="X-API-Key"),
+) -> None:
+    """Protect mutating operational endpoints when an admin key is configured."""
+    settings = get_settings()
+    if not settings.admin_api_key:
+        if settings.is_production:
+            raise HTTPException(status_code=503, detail="Administrative access is not configured")
+        return
+    if x_api_key != settings.admin_api_key:
+        raise HTTPException(status_code=401, detail="Administrative authentication required")
 
 
 @router.get("/groups")
@@ -87,7 +101,7 @@ async def get_cache_stats():
     return {"cache": cache_stats()}
 
 
-@router.delete("/cache")
+@router.delete("/cache", dependencies=[Depends(require_admin_key)])
 async def clear_tle_cache(group: Optional[str] = Query(None)):
     """Limpia la caché (un grupo o toda)"""
     await clear_cache(group)
