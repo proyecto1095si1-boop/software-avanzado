@@ -53,12 +53,12 @@ Todo el frontend habla **solo** con tu backend. El backend es el que habla con e
 | API | ¿Obligatoria? | Estado | Dónde poner la clave |
 |-----|---------------|--------|----------------------|
 | **CelesTrak** | Sí | **Ya conectada** | No requiere clave |
-| **Space-Track** | No | Lista para cablear | `backend/.env` → `SPACETRACK_USER/PASSWORD` |
-| **N2YO** | No | Lista | `N2YO_API_KEY` |
-| **ADS-B** (aviones) | No | Lista | `ADSB_API_URL` / `ADSB_API_KEY` |
-| **AIS** (buques) | No | Lista | `AIS_API_URL` / `AIS_API_KEY` |
-| **Lista cámaras** | No | Semilla local | `CAMERA_LIST_URL` |
-| **Shodan** | No | Lista | `SHODAN_API_KEY` |
+| **Space-Track** | No | No implementada | Configuración declarada; sin adaptador activo |
+| **N2YO** | No | No implementada | Configuración declarada; sin adaptador activo |
+| **ADS-B** (aviones) | No | No implementada | Configuración declarada; sin adaptador activo |
+| **AIS** (buques) | No | No implementada | Configuración declarada; sin adaptador activo |
+| **Cámaras** | No | Datos semilla de demostración | Sin inventario ni descubrimiento IP; plan de cámaras autorizadas |
+| **Shodan** | No | No implementada | No se usa para encontrar cámaras ajenas |
 
 ### Cómo agregar una clave
 
@@ -74,20 +74,23 @@ Guía detallada: **[docs/apis.md](docs/apis.md)**
 
 ### Prioridad recomendada
 
-1. **Nada extra** — con CelesTrak el sistema ya opera  
-2. **Space-Track** — TLE más robustos  
-3. **ADS-B** (ideal feed propio) — capa aviones  
-4. **CAMERA_LIST_URL** — más cámaras sin tocar código  
+1. **Identidad y permisos** — requeridos antes de exponer inventario sensible
+2. **Inventario autorizado de cámaras** — alcance aprobado, sin escaneo de terceros
+3. **Space-Track / ADS-B / AIS** — conectores explícitos según permiso y caso de uso
 
 ---
 
+## Plan de implementación
+
+La estructura de conectores, las acciones previstas y sus criterios de aceptación están en **[docs/IMPLEMENTACION_INICIAL.md](docs/IMPLEMENTACION_INICIAL.md)**. El esquema inicial de cámara solo valida datos de inventario; aún no abre conexiones ni expone endpoints de administración.
+
 ## Capacidades del panel
 
-- Satélites LIVE (WebSocket)  
-- Trazas orbitales al click  
-- Clasificación táctica  
-- Cámaras + AOI estratégicas  
-- Alertas (satélite sobre zona)  
+- Satélites LIVE (WebSocket)
+- Trazas orbitales al click
+- Clasificación táctica
+- Cámaras de demostración + AOI (sin acceso remoto a cámaras)
+- Alertas (satélite sobre zona)
 - Pases previstos  
 
 **Clasificación:** Uso privado / desarrollo interno

@@ -1,12 +1,7 @@
-"""
-Integraciones con APIs externas.
+"""Contratos y adaptadores para fuentes externas.
 
-Cada proveedor vive en su módulo:
-  - spacetrack.py  → Space-Track.org
-  - n2yo.py        → N2YO
-  - adsb.py        → ADS-B feeds
-  - ais.py         → AIS / buques
-
-La configuración (claves) está en app.config.Settings / .env
-Ver docs/apis.md
+El módulo `contracts` define procedencia/estado de datos y el `registry` permite
+registrar conectores explícitamente. Aún no se instancia un proveedor ni se
+realizan conexiones de red al importar este paquete. Ver
+`docs/IMPLEMENTACION_INICIAL.md` antes de añadir fuentes reales.
 """
