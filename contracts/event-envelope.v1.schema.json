@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://software-avanzado.example/contracts/event-envelope.v1.schema.json",
+  "title": "Software Avanzado Event Envelope v1",
+  "description": "Envelope interoperable para observaciones y resultados calculados de fuentes autorizadas.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "source_id",
+    "domain",
+    "data_kind",
+    "observed_at",
+    "ingested_at",
+    "payload"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "event_id": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "source_id": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "domain": {
+      "type": "string",
+      "enum": ["satellite", "aviation", "maritime", "camera", "radar", "weather", "earth_observation", "other"]
+    },
+    "data_kind": { "type": "string", "enum": ["observed", "calculated", "inferred"] },
+    "observed_at": { "type": "string", "format": "date-time" },
+    "ingested_at": { "type": "string", "format": "date-time" },
+    "position": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["latitude", "longitude"],
+      "properties": {
+        "latitude": { "type": "number", "minimum": -90, "maximum": 90 },
+        "longitude": { "type": "number", "minimum": -180, "maximum": 180 },
+        "altitude_m": { "type": ["number", "null"], "minimum": -12000, "maximum": 100000000 },
+        "horizontal_accuracy_m": { "type": ["number", "null"], "minimum": 0 }
+      }
+    },
+    "quality": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "authorization_scope": { "type": ["string", "null"], "maxLength": 200 },
+    "license_id": { "type": ["string", "null"], "maxLength": 200 },
+    "correlation_id": { "type": ["string", "null"], "maxLength": 160 },
+    "payload": { "type": "object" }
+  }
+}

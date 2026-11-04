@@ -1,5 +1,7 @@
 # Hoja de ruta integral — Software Avanzado
 
+> Para el mapa completo de dominios (cámaras, aviación, satélites, radar, clima, marítimo e imágenes), la matriz real de estados, estructura de carpetas y fases de expansión, consultar [ROADMAP_PLATAFORMA.md](ROADMAP_PLATAFORMA.md).
+
 ## Objetivo del producto
 
 Convertir el repositorio en una plataforma de conciencia situacional que integre fuentes geoespaciales y sensores autorizados en un cuadro operativo común. El objetivo inmediato debe ser una plataforma **segura, verificable y resiliente para uso institucional autorizado**. “Grado militar” no es una propiedad que pueda garantizarse solo con software: cualquier uso en defensa, infraestructura crítica o entornos regulados requiere requisitos del operador, evaluación de amenazas, pruebas independientes, acreditación aplicable y controles de operación.

@@ -70,7 +70,9 @@ docs/
   threat-model/                 # Activos, límites de confianza y amenazas
 ```
 
-Las carpetas `auth`, `audit`, `persistence`, `policy`, `providers`, `features` y `runbooks` son destino; no deben interpretarse como funcionalidad ya implementada. Se crearán junto con un primer archivo funcional/prueba por módulo, evitando directorios vacíos sin contrato.
+Las áreas `auth`, `audit`, `persistence`, `policy`, los dominios de aviación/marítimo/radar/clima/observación terrestre y sus carpetas de proveedor/frontend ya tienen scaffolds documentados. Son estructura y criterios, no funcionalidad operativa. `deploy`, `runbooks` y `threat-model` también contienen guías iniciales. No hay adaptadores activos de esas fuentes, persistencia nueva ni login.
+
+El esquema interoperable versionado está en `contracts/event-envelope.v1.schema.json`; el roadmap de dominios, acciones y etapas está en `ROADMAP_PLATAFORMA.md`. El objetivo es ir convirtiendo cada scaffold en un vertical probado (modelo + adaptador + API autorizada + UI + health + runbook), no crear conectores de muestra que aparenten acceso real.
 
 ## Contratos añadidos ahora
 

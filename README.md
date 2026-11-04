@@ -84,6 +84,8 @@ Guía detallada: **[docs/apis.md](docs/apis.md)**
 
 La estructura de conectores, las acciones previstas y sus criterios de aceptación están en **[docs/IMPLEMENTACION_INICIAL.md](docs/IMPLEMENTACION_INICIAL.md)**. El esquema inicial de cámara solo valida datos de inventario; aún no abre conexiones ni expone endpoints de administración.
 
+La expansión por dominios, carpetas y fases está en **[ROADMAP_PLATAFORMA.md](ROADMAP_PLATAFORMA.md)**. Aviación ADS-B, radar, AIS, clima y telemetría/contenido satelital externo no están conectados todavía. Para cámaras y telemetría se requieren fuentes, hardware y permisos del operador; no se buscan equipos o enlaces privados.
+
 ## Capacidades del panel
 
 - Satélites LIVE (WebSocket)
@@ -94,3 +96,8 @@ La estructura de conectores, las acciones previstas y sus criterios de aceptaci�
 - Pases previstos  
 
 **Clasificación:** Uso privado / desarrollo interno
+
+
+### Satélites: órbita y telemetría no son lo mismo
+
+Hoy la capa satelital calcula posiciones a partir de TLE de CelesTrak. La telemetría/contenido transmitido no está conectado: requerirá una API o estación terrestre autorizada y hardware/servicio compatible. No se accede a enlaces privados ni se sortean protecciones.

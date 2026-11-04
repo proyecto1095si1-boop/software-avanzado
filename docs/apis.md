@@ -5,6 +5,7 @@
 | Fuente | Estado en el código | Configuración / ubicación | Siguiente paso seguro |
 |---|---|---|---|
 | CelesTrak/TLE | Conectada | `backend/app/satellite/tle.py`; `CELESTRAK_BASE` opcional | Mostrar procedencia y edad de TLE; probar límites y fallos. |
+| SatCom/telemetría | Scaffold, no conectada | `backend/app/satcom/`; sin receptor/API/decoder | Integrar solo con servicio/ground station autorizado o distribución abierta/licenciada. |
 | Space-Track | No implementada | Hay variables de configuración; no hay adaptador proveedor | Implementar solo con cuenta autorizada, límites y políticas del proveedor. |
 | N2YO | No implementada | Hay variable de configuración; no hay adaptador proveedor | Definir caso de uso y condiciones de la API antes de integrar. |
 | ADS-B | No implementada | Configuración declarada; no hay adaptador proveedor | Conectar feed propio o licenciado y validar su esquema/cuota. |
