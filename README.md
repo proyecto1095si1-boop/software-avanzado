@@ -2,6 +2,8 @@
 
 **Sistema ISR unificado** — satélites, cámaras, AOI, alertas, pases y trazas en un solo cuadro de mando.
 
+**Versión actual: 0.9.0**
+
 ---
 
 ## Arranque
@@ -42,9 +44,18 @@ Frontend (panel)  ──proxy──►  Backend FastAPI
          │                     │                       │
          ▼                     ▼                       ▼
    CelesTrak (TLE)      inventario local         motor AOI
+   + ConnectorHealth
 ```
 
 Todo el frontend habla **solo** con tu backend. El backend es el que habla con el exterior.
+
+---
+
+## Últimos cambios (0.9.0)
+
+- **CI**: GitHub Actions ejecuta `compileall` + unit tests en cada push/PR a `main`.
+- **Conector formal CelesTrak**: implementa el protocolo `Connector`, se registra al arranque y reporta salud real en `/system/status` (`connector_health` + `registered_connectors`).
+- La API de satélites y la caché TLE no cambian de comportamiento.
 
 ---
 
@@ -52,7 +63,7 @@ Todo el frontend habla **solo** con tu backend. El backend es el que habla con e
 
 | API | ¿Obligatoria? | Estado | Dónde poner la clave |
 |-----|---------------|--------|----------------------|
-| **CelesTrak** | Sí | **Ya conectada** | No requiere clave |
+| **CelesTrak** | Sí | **Conectada + health check** | No requiere clave |
 | **Space-Track** | No | No implementada | Configuración declarada; sin adaptador activo |
 | **N2YO** | No | No implementada | Configuración declarada; sin adaptador activo |
 | **ADS-B** (aviones) | No | No implementada | Configuración declarada; sin adaptador activo |
