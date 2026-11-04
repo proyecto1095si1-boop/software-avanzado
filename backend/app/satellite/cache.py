@@ -3,15 +3,18 @@ Caché simple en memoria para grupos TLE.
 TTL por defecto: 2 horas (los TLE cambian lentamente).
 """
 
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple
 import asyncio
+from app.config import get_settings
 
 # Estructura: group -> (timestamp, list_of_satellites)
 _cache: Dict[str, Tuple[datetime, List[Dict]]] = {}
 _lock = asyncio.Lock()
 
-DEFAULT_TTL_SECONDS = 2 * 60 * 60  # 2 horas
+def _ttl_seconds() -> int:
+    """TTL configurado para la caché de TLE, con protección ante valores negativos."""
+    return max(0, get_settings().tle_cache_ttl_seconds)
 
 
 async def get_cached(group: str) -> Optional[List[Dict]]:
@@ -24,7 +27,7 @@ async def get_cached(group: str) -> Optional[List[Dict]]:
         cached_at, satellites = entry
         age = (datetime.now(timezone.utc) - cached_at).total_seconds()
 
-        if age > DEFAULT_TTL_SECONDS:
+        if age >= _ttl_seconds():
             del _cache[group]
             return None
 
@@ -55,6 +58,6 @@ def cache_stats() -> Dict:
         stats[group] = {
             "count": len(sats),
             "age_seconds": int(age),
-            "expires_in_seconds": max(0, int(DEFAULT_TTL_SECONDS - age)),
+            "expires_in_seconds": max(0, int(_ttl_seconds() - age)),
         }
     return stats

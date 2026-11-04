@@ -38,6 +38,13 @@ class Settings:
 
     # --- Sistema ---
     tle_cache_ttl_seconds: int = int(os.getenv("TLE_CACHE_TTL", str(2 * 60 * 60)))
+    cors_origins: list[str] = [
+        origin.strip()
+        for origin in os.getenv(
+            "CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+        ).split(",")
+        if origin.strip()
+    ]
 
     def status(self) -> dict:
         """Qué integraciones están configuradas (sin exponer secretos)."""

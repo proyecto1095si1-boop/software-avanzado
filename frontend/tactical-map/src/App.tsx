@@ -120,6 +120,8 @@ export default function App() {
           const msg: PositionsMessage = JSON.parse(ev.data);
           if (msg.type === "positions" && msg.satellites) {
             setSatellites(msg.satellites, msg.timestamp_utc);
+          } else if (msg.type === "error") {
+            ws.close();
           }
         } catch {
           /* ignore */

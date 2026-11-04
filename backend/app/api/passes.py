@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, Query, HTTPException
 from typing import Optional
 
@@ -6,6 +7,7 @@ from app.aoi.data import get_all_aois
 from app.satellite.passes import predict_passes
 
 router = APIRouter(prefix="/satellite", tags=["Satellite / Passes"])
+logger = logging.getLogger(__name__)
 
 
 @router.get("/passes")
@@ -45,5 +47,6 @@ async def get_passes(
         }
     except HTTPException:
         raise
-    except Exception as e:
-        raise HTTPException(status_code=502, detail=str(e))
+    except Exception:
+        logger.exception("No se pudieron calcular pases para el grupo %s", group)
+        raise HTTPException(status_code=502, detail="No se pudieron calcular los pases")

@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, Query, HTTPException
 from typing import Optional
 
@@ -6,6 +7,7 @@ from app.satellite.propagator import propagate, propagate_many
 from app.satellite.cache import cache_stats, clear_cache
 
 router = APIRouter(prefix="/satellite", tags=["Satellite / Space Domain"])
+logger = logging.getLogger(__name__)
 
 
 @router.get("/groups")
@@ -35,8 +37,9 @@ async def get_tle(
     try:
         sats = await get_satellites(group, force_refresh=force_refresh)
         return {"group": group, "count": len(sats), "satellites": sats}
-    except Exception as e:
-        raise HTTPException(status_code=502, detail=str(e))
+    except Exception:
+        logger.exception("No se pudo obtener el grupo TLE %s", group)
+        raise HTTPException(status_code=502, detail="No se pudieron obtener los datos TLE")
 
 
 @router.get("/position")
@@ -55,7 +58,9 @@ async def get_position(
 @router.get("/positions/{group}")
 async def get_positions(
     group: str = "stations",
-    limit: Optional[int] = Query(None, description="Máximo de satélites a devolver"),
+    limit: int = Query(
+        200, ge=1, le=1000, description="Máximo de satélites a devolver"
+    ),
     force_refresh: bool = Query(False, description="Forzar descarga fresca de TLE"),
 ):
     """
@@ -77,8 +82,9 @@ async def get_positions(
             "cached": not force_refresh,
             "satellites": positions,
         }
-    except Exception as e:
-        raise HTTPException(status_code=502, detail=str(e))
+    except Exception:
+        logger.exception("No se pudieron propagar posiciones del grupo %s", group)
+        raise HTTPException(status_code=502, detail="No se pudieron calcular las posiciones")
 
 
 @router.get("/cache/stats")

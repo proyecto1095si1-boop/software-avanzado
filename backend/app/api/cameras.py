@@ -21,7 +21,10 @@ async def get_cameras(
     Lista de cámaras públicas georreferenciadas.
     Filtros opcionales por tipo, país, estado y bounding box.
     """
-    cameras = list_cameras(type=type, country=country, status=status, bbox=bbox)
+    try:
+        cameras = list_cameras(type=type, country=country, status=status, bbox=bbox)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     return CameraListResponse(count=len(cameras), cameras=cameras)
 
 

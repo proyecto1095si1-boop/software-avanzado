@@ -13,6 +13,9 @@ docker compose up --build
 # O en desarrollo
 cd backend && pip install -r requirements.txt && uvicorn app.main:app --reload --port 8000
 cd frontend/tactical-map && npm install && npm run dev
+
+# Pruebas del backend (sin dependencias adicionales)
+cd backend && python -m unittest discover -s tests -v
 ```
 
 | Servicio | URL |
@@ -20,6 +23,10 @@ cd frontend/tactical-map && npm install && npm run dev
 | Cuadro de mando | http://localhost:5173 |
 | API + docs | http://localhost:8000/docs |
 | **Estado integraciones** | http://localhost:8000/system/status |
+
+Por defecto, Docker publica el panel y la API solo en `127.0.0.1`. Para permitir
+otros orígenes web, configura `CORS_ORIGINS` en `backend/.env` como una lista
+separada por comas. No uses `*` en despliegues expuestos a Internet.
 
 ---
 

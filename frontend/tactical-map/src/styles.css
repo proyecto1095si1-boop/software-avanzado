@@ -249,3 +249,42 @@ html, body, #root {
   color: var(--text);
   font-weight: 500;
 }
+
+@media (max-width: 760px) {
+  .app {
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+
+  .header {
+    min-height: 48px;
+    padding: 8px 10px;
+    align-items: flex-start;
+    gap: 8px;
+    flex-direction: column;
+  }
+
+  .header-meta {
+    width: 100%;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .main {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(40vh, 1fr) minmax(220px, 40vh);
+    overflow-y: auto;
+  }
+
+  .side {
+    border-left: 0;
+    border-top: 1px solid var(--border);
+    overflow-y: auto;
+  }
+
+  .statusbar {
+    min-height: 34px;
+    gap: 8px;
+    padding: 4px 10px;
+    flex-wrap: wrap;
+  }
+}

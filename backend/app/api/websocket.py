@@ -5,7 +5,7 @@ El cliente se conecta y recibe actualizaciones periódicas.
 
 import asyncio
 import json
-from typing import Optional
+import logging
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
 
@@ -13,14 +13,15 @@ from app.satellite.tle import get_satellites
 from app.satellite.propagator import propagate_many
 
 router = APIRouter(tags=["Realtime"])
+logger = logging.getLogger(__name__)
 
 
 @router.websocket("/ws/satellite/positions")
 async def ws_satellite_positions(
     websocket: WebSocket,
     group: str = Query("stations"),
-    interval: float = Query(5.0, description="Segundos entre actualizaciones"),
-    limit: Optional[int] = Query(None),
+    interval: float = Query(5.0, ge=2.0, le=60.0, description="Segundos entre actualizaciones"),
+    limit: int = Query(200, ge=1, le=1000),
 ):
     """
     Stream de posiciones geodésicas en vivo.
@@ -32,15 +33,11 @@ async def ws_satellite_positions(
     """
     await websocket.accept()
 
-    # Limitar intervalo para no saturar
-    interval = max(2.0, min(interval, 60.0))
-
     try:
         while True:
             try:
                 sats = await get_satellites(group)
-                if limit is not None and limit > 0:
-                    sats = sats[:limit]
+                sats = sats[:limit]
 
                 positions = propagate_many(sats)
 
@@ -54,10 +51,11 @@ async def ws_satellite_positions(
 
                 await websocket.send_text(json.dumps(payload))
 
-            except Exception as e:
+            except Exception:
+                logger.exception("Falló el stream de posiciones del grupo %s", group)
                 await websocket.send_text(json.dumps({
                     "type": "error",
-                    "detail": str(e),
+                    "detail": "No se pudieron actualizar las posiciones",
                 }))
 
             await asyncio.sleep(interval)

@@ -9,6 +9,7 @@ from app.api.alerts import router as alerts_router
 from app.api.passes import router as passes_router
 from app.api.track import router as track_router
 from app.api.system import router as system_router
+from app.config import get_settings
 
 app = FastAPI(
     title="Software Avanzado - ISR System",
@@ -18,8 +19,8 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=get_settings().cors_origins,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )

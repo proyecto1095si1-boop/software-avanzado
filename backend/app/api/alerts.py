@@ -1,17 +1,20 @@
+import logging
 from fastapi import APIRouter, Query, HTTPException
-from typing import Optional
 from datetime import datetime, timezone
 
 from app.alerts.models import AlertListResponse
 from app.alerts.service import check_satellite_over_aoi
 
 router = APIRouter(prefix="/alerts", tags=["Alerts / Tactical"])
+logger = logging.getLogger(__name__)
 
 
 @router.get("/check", response_model=AlertListResponse)
 async def check_alerts(
     group: str = Query("stations", description="Grupo TLE a evaluar"),
-    limit: Optional[int] = Query(200, description="Máximo de satélites a propagar"),
+    limit: int = Query(
+        200, ge=1, le=1000, description="Máximo de satélites a propagar"
+    ),
 ):
     """
     Evalúa posiciones actuales del grupo contra todas las AOI.
@@ -24,5 +27,6 @@ async def check_alerts(
             alerts=alerts,
             timestamp_utc=datetime.now(timezone.utc).isoformat(),
         )
-    except Exception as e:
-        raise HTTPException(status_code=502, detail=str(e))
+    except Exception:
+        logger.exception("No se pudieron evaluar alertas para el grupo %s", group)
+        raise HTTPException(status_code=502, detail="No se pudieron evaluar las alertas")
